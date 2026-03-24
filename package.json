@@ -16,7 +16,13 @@
     "./core/session": "./src/domains/core/session/index.ts",
     "./core/config": "./src/domains/core/config/index.ts",
     "./twitter": "./src/domains/twitter/index.ts",
+    "./twitter/oauth": "./src/domains/twitter/services/index.ts",
+    "./twitter/api": "./src/domains/twitter/services/twitter-api.service.ts",
+    "./twitter/types": "./src/domains/twitter/types/index.ts",
     "./linkedin": "./src/domains/linkedin/index.ts",
+    "./linkedin/oauth": "./src/domains/linkedin/services/index.ts",
+    "./linkedin/api": "./src/domains/linkedin/services/linkedin-api.service.ts",
+    "./linkedin/types": "./src/domains/linkedin/types/index.ts",
     "./instagram": "./src/domains/instagram/index.ts",
     "./facebook": "./src/domains/facebook/index.ts",
     "./threads": "./src/domains/threads/index.ts",
@@ -29,14 +35,26 @@
     "./mastodon": "./src/domains/mastodon/index.ts",
     "./medium": "./src/domains/medium/index.ts",
     "./hooks": "./src/application/hooks/index.ts",
+    "./hooks/use-social-auth": "./src/application/hooks/use-social-auth.hook.ts",
     "./providers": "./src/presentation/providers/index.ts",
+    "./providers/social-account": "./src/presentation/providers/social-account-provider.tsx",
     "./types": "./src/domain/types/index.ts",
     "./errors": "./src/domain/errors/index.ts",
+    "./infrastructure": "./src/infrastructure/index.ts",
+    "./infrastructure/storage": "./src/infrastructure/storage/index.ts",
+    "./infrastructure/http": "./src/infrastructure/http/index.ts",
+    "./infrastructure/utils": "./src/infrastructure/utils/index.ts",
     "./package.json": "./package.json"
   },
   "files": [
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umituz/web-social-account.git"
+  },
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rm -rf dist",
