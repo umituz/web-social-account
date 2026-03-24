@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import { InstagramError } from "../types";
 
 export class InstagramOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

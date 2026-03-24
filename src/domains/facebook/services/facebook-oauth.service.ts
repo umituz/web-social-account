@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import { FacebookError } from "../types";
 
 export class FacebookOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import { DiscordError } from "../types";
 
 export class DiscordOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

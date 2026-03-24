@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import { ThreadsError } from "../types";
 
 export class ThreadsOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;
