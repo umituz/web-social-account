@@ -14,7 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
-import type { YoutubeError } from "../types";
+import { YouTubeError } from "../types";
 
 export class YouTubeOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

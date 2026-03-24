@@ -48,11 +48,11 @@ export interface PinterestCreatePinResponse {
   url: string;
 }
 
-export interface PinterestError {
+export interface PinterestErrorResponse {
   code: number;
   message: string;
 }
-export interface pinterestError {
+export interface PinterestApiError {
   error: string | { message: string; code?: number };
 }
 
