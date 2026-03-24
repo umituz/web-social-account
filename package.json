@@ -1,0 +1,89 @@
+{
+  "name": "@umituz/web-social-account",
+  "version": "1.0.0",
+  "description": "Comprehensive social media account management with domain-based architecture for web applications",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./core": "./src/domains/core/index.ts",
+    "./core/oauth": "./src/domains/core/oauth/index.ts",
+    "./core/account": "./src/domains/core/account/index.ts",
+    "./core/session": "./src/domains/core/session/index.ts",
+    "./core/config": "./src/domains/core/config/index.ts",
+    "./twitter": "./src/domains/twitter/index.ts",
+    "./linkedin": "./src/domains/linkedin/index.ts",
+    "./instagram": "./src/domains/instagram/index.ts",
+    "./facebook": "./src/domains/facebook/index.ts",
+    "./threads": "./src/domains/threads/index.ts",
+    "./tiktok": "./src/domains/tiktok/index.ts",
+    "./pinterest": "./src/domains/pinterest/index.ts",
+    "./reddit": "./src/domains/reddit/index.ts",
+    "./youtube": "./src/domains/youtube/index.ts",
+    "./discord": "./src/domains/discord/index.ts",
+    "./telegram": "./src/domains/telegram/index.ts",
+    "./mastodon": "./src/domains/mastodon/index.ts",
+    "./medium": "./src/domains/medium/index.ts",
+    "./hooks": "./src/application/hooks/index.ts",
+    "./providers": "./src/presentation/providers/index.ts",
+    "./types": "./src/domain/types/index.ts",
+    "./errors": "./src/domain/errors/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "social-media",
+    "oauth",
+    "twitter",
+    "linkedin",
+    "instagram",
+    "facebook",
+    "threads",
+    "tiktok",
+    "pinterest",
+    "reddit",
+    "youtube",
+    "discord",
+    "telegram",
+    "mastodon",
+    "medium",
+    "authentication",
+    "authorization",
+    "account-management",
+    "social-integration",
+    "react",
+    "web",
+    "typescript",
+    "ddd",
+    "domain-driven-design",
+    "package-driven"
+  ],
+  "author": "umituz",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "dependencies": {
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0"
+  }
+}
