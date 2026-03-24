@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import { PinterestError } from "../types";
 
 export class PinterestOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

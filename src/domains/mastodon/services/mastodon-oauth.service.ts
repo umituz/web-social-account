@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import { MastodonError } from "../types";
 
 export class MastodonOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

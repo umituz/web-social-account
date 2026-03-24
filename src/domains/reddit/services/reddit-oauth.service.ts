@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import { RedditError } from "../types";
 
 export class RedditOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;
