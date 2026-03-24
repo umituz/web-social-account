@@ -67,3 +67,17 @@ export interface DiscordError {
 export interface discordError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Discord OAuth/API Error
+ */
+export class DiscordError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'DiscordError';
+  }
+}

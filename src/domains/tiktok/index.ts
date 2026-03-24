@@ -1,7 +1,8 @@
 /**
- * TikTok domain exports
+ * Tiktok domain exports
  */
 
-// TODO: Implement TikTok domain
+// TODO: Implement Tiktok domain
+export * from "./constants";
 export * from "./types";
 export * from "./services";

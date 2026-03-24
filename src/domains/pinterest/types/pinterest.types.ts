@@ -55,3 +55,17 @@ export interface PinterestError {
 export interface pinterestError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Pinterest OAuth/API Error
+ */
+export class PinterestError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'PinterestError';
+  }
+}

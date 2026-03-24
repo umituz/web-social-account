@@ -6,7 +6,7 @@ import type {
   IOAuthService,
   OAuthTokens,
   PlatformConfig,
-} from "../../../domain/types";
+} from "../../core";
 import {
   OAuthError,
   InvalidTokenError,

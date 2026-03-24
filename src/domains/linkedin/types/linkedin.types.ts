@@ -2,6 +2,16 @@
  * LinkedIn-specific types
  */
 
+import {
+  LINKEDIN_API_ENDPOINTS,
+  LINKEDIN_SHARE_CONTENT,
+  LINKEDIN_MEMBER_NETWORK_VISIBILITY,
+  LINKEDIN_MEDIA_CATEGORY,
+  LINKEDIN_VISIBILITY,
+  type LinkedInVisibility,
+  type LinkedInMediaCategory,
+} from "../constants/linkedin.constants";
+
 export interface LinkedInProfile {
   id: string;
   firstName?: {
@@ -27,11 +37,11 @@ export interface LinkedInPost {
   author: string;
   lifecycleState: "PUBLISHED" | "DRAFT" | "ARCHIVED";
   specificContent?: {
-    "com.linkedin.ugc.ShareContent"?: {
+    [LINKEDIN_SHARE_CONTENT]?: {
       shareCommentary?: {
         text: string;
       };
-      shareMediaCategory: "NONE" | "ARTICLE" | "IMAGE";
+      shareMediaCategory: LinkedInMediaCategory;
       media?: Array<{
         status: "READY" | "PROCESSING" | "ERROR";
         description?: {
@@ -45,7 +55,7 @@ export interface LinkedInPost {
     };
   };
   visibility?: {
-    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" | "CONNECTIONS" | "LOGGED_IN";
+    [LINKEDIN_MEMBER_NETWORK_VISIBILITY]: LinkedInVisibility;
   };
 }
 
@@ -56,9 +66,6 @@ export interface LinkedInResponse<T> {
 
 export interface LinkedInError {
   serviceErrorCode: number;
-    message: string;
-    status: number;
-}
-export interface linkedinError {
-  error: string | { message: string; code?: number };
+  message: string;
+  status: number;
 }

@@ -49,3 +49,17 @@ export interface TikTokError {
 export interface tiktokError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Tiktok OAuth/API Error
+ */
+export class TiktokError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'TiktokError';
+  }
+}

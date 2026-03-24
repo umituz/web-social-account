@@ -44,3 +44,17 @@ export interface ThreadsError {
 export interface threadsError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Threads OAuth/API Error
+ */
+export class ThreadsError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'ThreadsError';
+  }
+}

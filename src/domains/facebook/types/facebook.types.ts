@@ -51,3 +51,17 @@ export interface FacebookError {
 export interface facebookError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Facebook OAuth/API Error
+ */
+export class FacebookError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'FacebookError';
+  }
+}
