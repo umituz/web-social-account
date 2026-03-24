@@ -8,12 +8,12 @@ import type {
   PlatformConfig,
   SocialAccount,
 } from "../../domain/types";
-import { TwitterOAuthService } from "../domains/twitter";
-import { LinkedInOAuthService } from "../domains/linkedin";
+import { TwitterOAuthService } from "../../domains/twitter";
+import { LinkedInOAuthService } from "../../domains/linkedin";
 import {
   OAuthError,
   ConfigurationError,
-} from "../domain/errors";
+} from "../../domain/errors";
 
 interface UseSocialAuthState {
   isLoading: boolean;

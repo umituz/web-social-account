@@ -53,13 +53,13 @@ export interface tiktokError {
 /**
  * Tiktok OAuth/API Error
  */
-export class TiktokError extends Error {
+export class TikTokError extends Error {
   constructor(
     message: string,
     public code?: string,
     public statusCode?: number
   ) {
     super(message);
-    this.name = 'TiktokError';
+    this.name = 'TikTokError';
   }
 }

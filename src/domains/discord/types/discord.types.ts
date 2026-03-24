@@ -60,11 +60,11 @@ export interface DiscordMessage {
   embeds: unknown[];
 }
 
-export interface DiscordError {
+export interface DiscordErrorResponse {
   code: number;
   message: string;
 }
-export interface discordError {
+export interface DiscordApiError {
   error: string | { message: string; code?: number };
 }
 

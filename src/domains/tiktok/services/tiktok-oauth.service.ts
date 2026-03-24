@@ -14,7 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
-import type { TiktokError } from "../types";
+import { TikTokError } from "../types";
 
 export class TikTokOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

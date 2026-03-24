@@ -5,4 +5,4 @@
 // TODO: Implement Reddit constants
 
 // Placeholder export to make this a valid module
-export const PLACEHOLDER = true;
+export const Reddit_CONSTANTS_PLACEHOLDER = true;
