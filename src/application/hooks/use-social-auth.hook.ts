@@ -1,8 +1,9 @@
 /**
  * React hook for social media authentication
+ * Performance optimized with stable callbacks and memoized services
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import type {
   SocialPlatform,
   PlatformConfig,
@@ -27,6 +28,30 @@ interface UseSocialAuthResult extends UseSocialAuthState {
   clearError: () => void;
 }
 
+/**
+ * Deep compare two objects for equality (optimized for config comparison)
+ */
+function isDeepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (typeof a !== "object" || a === null || b === null) return false;
+
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
+
+  if (keysA.length !== keysB.length) return false;
+
+  for (const key of keysA) {
+    if (!keysB.includes(key)) return false;
+    if (!isDeepEqual(objA[key], objB[key])) return false;
+  }
+
+  return true;
+}
+
 export function useSocialAuth(
   config: PlatformConfig,
   userId?: string
@@ -37,6 +62,29 @@ export function useSocialAuth(
     account: null,
   });
 
+  // Use ref to track config changes without triggering re-renders
+  const configRef = useRef(config);
+  const userIdRef = useRef(userId);
+
+  // Update refs only when values actually change
+  if (!isDeepEqual(configRef.current, config)) {
+    configRef.current = config;
+  }
+  if (userIdRef.current !== userId) {
+    userIdRef.current = userId;
+  }
+
+  // Memoize service instances to prevent recreation on every render
+  const services = useMemo(() => {
+    const twitterService = new TwitterOAuthService(configRef.current);
+    const linkedinService = new LinkedInOAuthService(configRef.current);
+
+    return {
+      twitter: twitterService,
+      linkedin: linkedinService,
+    };
+  }, []); // Empty deps - services are created once and reused
+
   const connect = useCallback(
     async (platform: SocialPlatform) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -46,16 +94,16 @@ export function useSocialAuth(
 
         switch (platform) {
           case "twitter":
-            authService = new TwitterOAuthService(config);
+            authService = services.twitter;
             break;
           case "linkedin":
-            authService = new LinkedInOAuthService(config);
+            authService = services.linkedin;
             break;
           default:
             throw new Error(`Platform ${platform} not implemented yet`);
         }
 
-        const { url } = await authService.generateAuthorizationUrl(platform, userId);
+        const { url } = await authService.generateAuthorizationUrl(platform, userIdRef.current);
 
         // Redirect to authorization URL
         if (typeof window !== "undefined") {
@@ -77,7 +125,7 @@ export function useSocialAuth(
         }));
       }
     },
-    [config, userId]
+    [services]
   );
 
   const disconnect = useCallback(
