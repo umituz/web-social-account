@@ -39,7 +39,7 @@ export interface IOAuthService {
   /**
    * Validate OAuth state
    */
-  validateState(state: string): boolean;
+  validateState(state: string): Promise<boolean>;
 
   /**
    * Generate PKCE code challenge

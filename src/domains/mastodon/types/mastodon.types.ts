@@ -71,3 +71,6 @@ export interface MastodonApp {
 export interface MastodonError {
   error: string;
 }
+export interface mastodonError {
+  error: string | { message: string; code?: number };
+}

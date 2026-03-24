@@ -47,5 +47,8 @@ export interface MediumError {
   errors: Array<{
     message: string;
     code: number;
-  };
+  }>;
+}
+export interface mediumError {
+  error: string | { message: string; code?: number };
 }

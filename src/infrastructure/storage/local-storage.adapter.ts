@@ -75,7 +75,7 @@ export class LocalStorageAdapter implements ISessionStorage {
 
       try {
         const session = JSON.parse(value) as SessionData;
-        if (now - session.oauth_state.timestamp > maxAge) {
+        if (now - session.oauthState.timestamp > maxAge) {
           localStorage.removeItem(key);
         }
       } catch {

@@ -49,3 +49,6 @@ export interface TelegramResponse<T> {
   error_code?: number;
   description?: string;
 }
+export interface telegramError {
+  error: string | { message: string; code?: number };
+}

@@ -55,3 +55,6 @@ export interface YouTubeError {
     status: string;
   };
 }
+export interface youtubeError {
+  error: string | { message: string; code?: number };
+}

@@ -48,3 +48,6 @@ export interface FacebookError {
     error_subcode?: number;
   };
 }
+export interface facebookError {
+  error: string | { message: string; code?: number };
+}

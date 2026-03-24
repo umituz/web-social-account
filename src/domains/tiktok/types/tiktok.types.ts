@@ -46,3 +46,6 @@ export interface TikTokError {
     log_id: string;
   };
 }
+export interface tiktokError {
+  error: string | { message: string; code?: number };
+}

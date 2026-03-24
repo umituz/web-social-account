@@ -52,3 +52,6 @@ export interface PinterestError {
   code: number;
   message: string;
 }
+export interface pinterestError {
+  error: string | { message: string; code?: number };
+}

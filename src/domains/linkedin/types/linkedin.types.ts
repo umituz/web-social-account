@@ -27,7 +27,7 @@ export interface LinkedInPost {
   author: string;
   lifecycleState: "PUBLISHED" | "DRAFT" | "ARCHIVED";
   specificContent?: {
-    com.linkedin.ugc.ShareContent?: {
+    "com.linkedin.ugc.ShareContent"?: {
       shareCommentary?: {
         text: string;
       };
@@ -45,7 +45,7 @@ export interface LinkedInPost {
     };
   };
   visibility?: {
-    com.linkedin.ugc.MemberNetworkVisibility: "PUBLIC" | "CONNECTIONS" | "LOGGED_IN";
+    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" | "CONNECTIONS" | "LOGGED_IN";
   };
 }
 
@@ -58,4 +58,7 @@ export interface LinkedInError {
   serviceErrorCode: number;
     message: string;
     status: number;
+}
+export interface linkedinError {
+  error: string | { message: string; code?: number };
 }
