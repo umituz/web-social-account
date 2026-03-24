@@ -42,3 +42,6 @@ export interface InstagramError {
     error_subcode?: number;
   };
 }
+export interface instagramError {
+  error: string | { message: string; code?: number };
+}

@@ -52,3 +52,6 @@ export interface RedditError {
   error: number;
   message: string;
 }
+export interface redditError {
+  error: string | { message: string; code?: number };
+}

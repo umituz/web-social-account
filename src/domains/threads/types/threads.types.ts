@@ -41,3 +41,6 @@ export interface ThreadsError {
     code: number;
   };
 }
+export interface threadsError {
+  error: string | { message: string; code?: number };
+}

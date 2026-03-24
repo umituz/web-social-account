@@ -7,11 +7,9 @@ import type {
   SocialPlatform,
   PlatformConfig,
   SocialAccount,
-} from "../../domain/types";
-import {
-  TwitterOAuthService,
-  LinkedInOAuthService,
-} from "../../domains";
+} from "../../../domain/types";
+import { TwitterOAuthService } from "../../domains/twitter";
+import { LinkedInOAuthService } from "../../domains/linkedin";
 import {
   OAuthError,
   ConfigurationError,

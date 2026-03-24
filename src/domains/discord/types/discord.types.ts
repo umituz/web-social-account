@@ -64,3 +64,6 @@ export interface DiscordError {
   code: number;
   message: string;
 }
+export interface discordError {
+  error: string | { message: string; code?: number };
+}

@@ -63,3 +63,6 @@ export interface TwitterApiError {
   type: string;
   status: number;
 }
+export interface twitterError {
+  error: string | { message: string; code?: number };
+}

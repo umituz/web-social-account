@@ -6,13 +6,13 @@ import type {
   IOAuthService,
   OAuthTokens,
   PlatformConfig,
-} from "../../core";
+} from "../../../domain/types";
 import {
   OAuthError,
   InvalidTokenError,
   ConfigurationError,
   NetworkError,
-} from "../../../../domain/errors";
+} from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
 
 export class InstagramOAuthService implements IOAuthService {
