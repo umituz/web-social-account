@@ -58,3 +58,17 @@ export interface YouTubeError {
 export interface youtubeError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Youtube OAuth/API Error
+ */
+export class YoutubeError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'YoutubeError';
+  }
+}

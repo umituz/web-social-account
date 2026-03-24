@@ -1,7 +1,8 @@
 /**
- * YouTube domain exports
+ * Youtube domain exports
  */
 
-// TODO: Implement YouTube domain
+// TODO: Implement Youtube domain
+export * from "./constants";
 export * from "./types";
 export * from "./services";

@@ -74,3 +74,17 @@ export interface MastodonError {
 export interface mastodonError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Mastodon OAuth/API Error
+ */
+export class MastodonError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'MastodonError';
+  }
+}

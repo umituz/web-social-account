@@ -52,3 +52,17 @@ export interface MediumError {
 export interface mediumError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Medium OAuth/API Error
+ */
+export class MediumError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'MediumError';
+  }
+}

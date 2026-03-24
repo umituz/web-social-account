@@ -6,7 +6,7 @@ import type {
   IOAuthService,
   OAuthTokens,
   PlatformConfig,
-} from "../../../domain/types";
+} from "../../core";
 import {
   OAuthError,
   InvalidTokenError,
@@ -14,6 +14,7 @@ import {
   NetworkError,
 } from "../../../domain/errors";
 import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import type { TiktokError } from "../types";
 
 export class TikTokOAuthService implements IOAuthService {
   private config: PlatformConfigEntity;

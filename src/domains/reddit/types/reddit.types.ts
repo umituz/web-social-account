@@ -55,3 +55,17 @@ export interface RedditError {
 export interface redditError {
   error: string | { message: string; code?: number };
 }
+
+/**
+ * Reddit OAuth/API Error
+ */
+export class RedditError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public statusCode?: number
+  ) {
+    super(message);
+    this.name = 'RedditError';
+  }
+}
