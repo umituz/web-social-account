@@ -47,14 +47,8 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "src",
-    "README.md",
-    "LICENSE"
+    "src"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/umituz/web-social-account.git"
-  },
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rm -rf dist",
