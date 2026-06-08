@@ -9,6 +9,8 @@ import type {
   SocialPlatform,
   AccountStatus,
 } from "../../../../domain/types";
+import { minutesToMs } from "../../../../shared/time/duration";
+import { isTokenExpired, isTokenExpiringSoon } from "../../../../shared/predicates";
 
 export class SocialAccountEntity implements SocialAccount {
   id: string;
@@ -34,13 +36,11 @@ export class SocialAccountEntity implements SocialAccount {
   }
 
   isTokenExpired(): boolean {
-    if (!this.tokens.expiresAt) return false;
-    return Date.now() >= this.tokens.expiresAt;
+    return isTokenExpired(this.tokens.expiresAt);
   }
 
-  isTokenExpiringSoon(thresholdMs: number = 300000): boolean {
-    if (!this.tokens.expiresAt) return false;
-    return Date.now() + thresholdMs >= this.tokens.expiresAt;
+  isTokenExpiringSoon(thresholdMs: number = minutesToMs(5)): boolean {
+    return isTokenExpiringSoon(this.tokens.expiresAt, thresholdMs);
   }
 
   isActive(): boolean {

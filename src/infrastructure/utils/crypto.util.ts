@@ -2,27 +2,27 @@
  * Cryptographic utilities for PKCE and security
  */
 
+const PKCE_ALPHABET =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 export class CryptoUtils {
   /**
-   * Generate random string for PKCE code verifier
+   * Generate cryptographically-secure random string (PKCE-safe alphabet)
+   * Length 43-128 per RFC 7636.
    */
   static generateRandomString(length: number): string {
     const bytes = new Uint8Array(length);
     crypto.getRandomValues(bytes);
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    return Array.from(bytes, (b) => chars[b % chars.length]).join("");
+    return Array.from(bytes, (b) => PKCE_ALPHABET[b % PKCE_ALPHABET.length]).join("");
   }
 
   /**
-   * Generate PKCE code challenge from verifier
+   * Generate PKCE code challenge from verifier (S256 method)
    */
   static async generateCodeChallenge(verifier: string): Promise<string> {
     const data = new TextEncoder().encode(verifier);
     const hash = await crypto.subtle.digest("SHA-256", data);
-    return btoa(String.fromCharCode(...new Uint8Array(hash)))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+    return this.base64UrlEncodeBytes(new Uint8Array(hash));
   }
 
   /**
@@ -33,7 +33,7 @@ export class CryptoUtils {
   }
 
   /**
-   * Generate SHA-256 hash
+   * Generate SHA-256 hash (hex encoded)
    */
   static async sha256(message: string): Promise<string> {
     const data = new TextEncoder().encode(message);
@@ -44,10 +44,21 @@ export class CryptoUtils {
   }
 
   /**
-   * Base64 URL encode
+   * Base64 URL encode (string input)
    */
   static base64UrlEncode(data: string): string {
-    return btoa(data)
+    return this.base64UrlEncodeBytes(new TextEncoder().encode(data));
+  }
+
+  /**
+   * Base64 URL encode (bytes input)
+   */
+  static base64UrlEncodeBytes(bytes: Uint8Array): string {
+    let binary = "";
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte);
+    }
+    return btoa(binary)
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/, "");

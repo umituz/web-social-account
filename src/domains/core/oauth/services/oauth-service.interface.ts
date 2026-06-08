@@ -4,6 +4,12 @@
 
 import type { SocialPlatform } from "../../../../domain/types";
 
+export interface OAuthTokenResponse {
+  accessToken: string;
+  refreshToken?: string;
+  expiresIn?: number;
+}
+
 export interface IOAuthService {
   /**
    * Generate authorization URL for OAuth flow
@@ -21,7 +27,7 @@ export interface IOAuthService {
     code: string,
     state: string,
     redirectUri: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }>;
+  ): Promise<OAuthTokenResponse>;
 
   /**
    * Refresh access token using refresh token
@@ -29,7 +35,7 @@ export interface IOAuthService {
   refreshToken(
     platform: SocialPlatform,
     refreshToken: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }>;
+  ): Promise<OAuthTokenResponse>;
 
   /**
    * Revoke access token

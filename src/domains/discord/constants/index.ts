@@ -1,8 +1,5 @@
 /**
- * Discord constants
+ * Discord constants exports
  */
 
-// TODO: Implement Discord constants
-
-// Placeholder export to make this a valid module
-export const Discord_CONSTANTS_PLACEHOLDER = true;
+export * from "./discord.constants";

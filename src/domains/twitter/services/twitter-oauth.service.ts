@@ -1,186 +1,63 @@
 /**
- * Twitter OAuth Service Implementation
+ * Twitter OAuth Service
  */
 
-import type {
-  IOAuthService,
-  OAuthTokens,
-  PlatformConfig,
-} from "../../core";
-import {
-  OAuthError,
-  InvalidTokenError,
-  ConfigurationError,
-  NetworkError,
-} from "../../../domain/errors";
-import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import type { PlatformConfig, SocialPlatform } from "../../../domain/types";
+import { BaseOAuthService, TokenRequestBody, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";
+import type { ISessionStorage } from "../../core/session/repositories/session-storage.interface";
+import { HttpClient } from "../../../infrastructure/http/http-client.util";
 
-export class TwitterOAuthService implements IOAuthService {
-  private config: PlatformConfigEntity;
-
-  constructor(config: PlatformConfig) {
-    this.config = config instanceof PlatformConfigEntity ? config : new PlatformConfigEntity(config);
-
-    if (!this.config.validate()) {
-      throw new ConfigurationError("twitter", "Invalid Twitter OAuth configuration");
-    }
+export class TwitterOAuthService extends BaseOAuthService {
+  constructor(
+    config: PlatformConfig,
+    http: HttpClient = new HttpClient(),
+    storage: ISessionStorage | null = null
+  ) {
+    super("twitter", config, http, storage);
   }
 
-  async generateAuthorizationUrl(platform: string, userId?: string): Promise<{
-    url: string;
-    state: string;
-  }> {
-    try {
-      const { codeVerifier, codeChallenge } = await this.generatePKCEChallenge();
-      const state = crypto.randomUUID();
-
-      const url = this.config.getAuthorizationUrl(state, codeChallenge);
-
-      // Store state and verifier (implementation depends on storage)
-      const stateData = {
-        state,
-        codeVerifier,
-        userId,
-        timestamp: Date.now(),
-        platform: "twitter" as const,
-      };
-
-      return {
-        url: url.toString(),
-        state,
-      };
-    } catch (error) {
-      throw new OAuthError(
-        "twitter",
-        error instanceof Error ? error.message : "Failed to generate authorization URL",
-        error
-      );
-    }
-  }
-
-  async exchangeCodeForToken(
-    platform: string,
-    code: string,
-    state: string,
-    redirectUri: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("grant_type", "authorization_code");
-      params.set("code", code);
-      params.set("redirect_uri", redirectUri);
-      params.set("client_id", this.config.oAuth.clientId);
-
-      const response = await fetch(this.config.oAuth.tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-
-      if (!response.ok) {
-        const error = (await response.json().catch(() => null)) as { error?: string };
-        throw new OAuthError("twitter", `Token exchange failed: ${error?.error || "Unknown error"}`, error);
-      }
-
-      const data = (await response.json()) as OAuthTokens;
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof OAuthError) throw error;
-      throw new NetworkError("twitter", "Failed to exchange code for token", error);
-    }
-  }
-
-  async refreshToken(
-    platform: string,
-    refreshToken: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("grant_type", "refresh_token");
-      params.set("refresh_token", refreshToken);
-      params.set("client_id", this.config.oAuth.clientId);
-
-      const response = await fetch(this.config.oAuth.tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-
-      if (!response.ok) {
-        throw new InvalidTokenError("twitter", { refreshToken });
-      }
-
-      const data = (await response.json()) as OAuthTokens;
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof InvalidTokenError) throw error;
-      throw new NetworkError("twitter", "Failed to refresh token", error);
-    }
-  }
-
-  async revokeToken(platform: string, token: string): Promise<void> {
-    try {
-      await fetch("https://api.twitter.com/2/oauth2/revoke", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Bearer ${token}`,
-        },
-        body: new URLSearchParams({
-          token,
-          token_type_hint: "access_token",
-        }).toString(),
-      });
-    } catch (error) {
-      throw new NetworkError("twitter", "Failed to revoke token", error);
-    }
-  }
-
-  async validateState(state: string): Promise<boolean> {
-    // Implementation depends on storage
+  protected supportsPKCE(): boolean {
     return true;
   }
 
-  async generatePKCEChallenge(): Promise<{
-    codeVerifier: string;
-    codeChallenge: string;
-  }> {
-    const codeVerifier = this.generateRandomString(64);
-    const codeChallenge = await this.generateCodeChallenge(codeVerifier);
-    return { codeVerifier, codeChallenge };
+  protected getAuthorizationParams(state: string, codeChallenge?: string): AuthorizationUrlParams {
+    return {
+      response_type: this.config.oAuth.responseType ?? "code",
+      client_id: this.config.oAuth.clientId,
+      redirect_uri: this.config.oAuth.redirectUri,
+      scope: this.config.oAuth.scope.join(" "),
+      state,
+      code_challenge: codeChallenge,
+      code_challenge_method: this.config.oAuth.codeChallengeMethod ?? "S256",
+    };
   }
 
-  private generateRandomString(length: number): string {
-    const bytes = new Uint8Array(length);
-    crypto.getRandomValues(bytes);
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    return Array.from(bytes, (b) => chars[b % chars.length]).join("");
+  protected getTokenRequestBody(code: string, redirectUri: string): TokenRequestBody {
+    return {
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: redirectUri,
+      client_id: this.config.oAuth.clientId,
+    };
   }
 
-  private async generateCodeChallenge(verifier: string): Promise<string> {
-    const data = new TextEncoder().encode(verifier);
-    const hash = await crypto.subtle.digest("SHA-256", data);
-    return btoa(String.fromCharCode(...new Uint8Array(hash)))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+  protected getRevokeUrl(_token: string): string {
+    return "https://api.twitter.com/2/oauth2/revoke";
+  }
+
+  protected getRevokeBody(token: string): Record<string, string> {
+    return { token, token_type_hint: "access_token" };
+  }
+
+  protected parseTokenError(data: unknown): string {
+    if (data && typeof data === "object" && "error" in data) {
+      const errorField = (data as { error?: string }).error;
+      if (typeof errorField === "string") return `Token exchange failed: ${errorField}`;
+    }
+    return "Token exchange failed";
+  }
+
+  generateAuthorizationUrl(platform: SocialPlatform, userId?: string) {
+    return super.generateAuthorizationUrl(platform, userId);
   }
 }

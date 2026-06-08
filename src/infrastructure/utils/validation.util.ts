@@ -1,63 +1,39 @@
 /**
- * Validation utilities
+ * Backward-compatible re-export of the package's validation helpers.
+ *
+ * Prefer importing directly from the canonical modules:
+ *   import { hasValidEmailShape } from "@umituz/web-social-account/shared";
+ *
+ * @deprecated import from the new locations; this shim is kept only
+ * so existing consumers keep compiling.
  */
 
-export class ValidationUtils {
-  /**
-   * Validate URL
-   */
-  static isValidUrl(url: string): boolean {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  }
+export {
+  hasValidEmailShape,
+  hasValidUrlShape,
+  hasValidOAuthStateShape,
+  hasValidPlatformConfigShape,
+  hasValidPkceVerifierShape,
+  hasAllRequiredFields,
+} from "../../shared/validators";
 
-  /**
-   * Validate email
-   */
-  static isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
+import { hasValidEmailShape } from "../../shared/validators/email-shape.validator";
+import { hasValidUrlShape } from "../../shared/validators/url-shape.validator";
+import { hasValidOAuthStateShape } from "../../shared/validators/oauth-state-shape.validator";
+import { hasValidPlatformConfigShape } from "../../shared/validators/platform-config-shape.validator";
+import { hasAllRequiredFields } from "../../shared/validators/required-fields.validator";
 
-  /**
-   * Validate OAuth state format
-   */
-  static isValidState(state: string): boolean {
-    // State should be a valid UUID or at least 8 characters
-    return /^[a-f0-9-]{8,}$/i.test(state) || state.length >= 8;
-  }
-
-  /**
-   * Sanitize user input
-   */
-  static sanitizeInput(input: string): string {
-    return input.replace(/[<>]/g, "");
-  }
-
-  /**
-   * Validate required fields
-   */
-  static validateRequired(obj: Record<string, unknown>, fields: string[]): boolean {
-    return fields.every((field) => obj[field] !== undefined && obj[field] !== null && obj[field] !== "");
-  }
-
-  /**
-   * Validate platform config
-   */
-  static validatePlatformConfig(config: {
-    clientId?: string;
-    clientSecret?: string;
-    redirectUri?: string;
-  }): boolean {
-    return !!(
-      config.clientId &&
-      config.clientSecret &&
-      config.redirectUri &&
-      this.isValidUrl(config.redirectUri)
-    );
-  }
-}
+/**
+ * Aggregate façade preserving the pre-refactor class-based API.
+ * New code should call the named functions directly.
+ */
+export const ValidationUtils = {
+  isValidEmail: (email: string) => hasValidEmailShape(email),
+  isValidUrl: (url: string) => hasValidUrlShape(url),
+  isValidState: (state: string) => hasValidOAuthStateShape(state),
+  validatePlatformConfig: (config: { clientId?: string; clientSecret?: string; redirectUri?: string }) =>
+    hasValidPlatformConfigShape(config),
+  validateRequired: (obj: Record<string, unknown>, fields: string[]) =>
+    hasAllRequiredFields(obj, fields),
+  sanitizeInput: (input: string) => input.replace(/[<>]/g, ""),
+};

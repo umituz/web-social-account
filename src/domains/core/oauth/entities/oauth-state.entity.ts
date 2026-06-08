@@ -3,6 +3,8 @@
  */
 
 import type { OAuthState, SocialPlatform } from "../../../../domain/types";
+import { minutesToMs } from "../../../../shared/time/duration";
+import { isStateExpired } from "../../../../shared/predicates";
 
 export class OAuthStateEntity implements OAuthState {
   state: string;
@@ -21,8 +23,8 @@ export class OAuthStateEntity implements OAuthState {
     this.redirectUri = data.redirectUri;
   }
 
-  isExpired(maxAge: number = 600000): boolean {
-    return Date.now() - this.timestamp > maxAge;
+  isExpired(maxAge: number = minutesToMs(10)): boolean {
+    return isStateExpired(this.timestamp, maxAge);
   }
 
   toJSON(): OAuthState {

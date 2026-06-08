@@ -4,6 +4,10 @@
 
 export * from "./entities/oauth-state.entity";
 export * from "./services/oauth-service.interface";
+export * from "./services/base-oauth.service";
 
-// Re-export for convenience - all OAuth services should import this
-export type { IOAuthService } from "./services/oauth-service.interface";
+export type { IOAuthService, OAuthTokenResponse } from "./services/oauth-service.interface";
+export type {
+  AuthorizationUrlParams,
+  TokenRequestBody,
+} from "./services/base-oauth.service";

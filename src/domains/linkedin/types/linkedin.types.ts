@@ -3,11 +3,8 @@
  */
 
 import {
-  LINKEDIN_API_ENDPOINTS,
   LINKEDIN_SHARE_CONTENT,
   LINKEDIN_MEMBER_NETWORK_VISIBILITY,
-  LINKEDIN_MEDIA_CATEGORY,
-  LINKEDIN_VISIBILITY,
   type LinkedInVisibility,
   type LinkedInMediaCategory,
 } from "../constants/linkedin.constants";
@@ -59,7 +56,7 @@ export interface LinkedInPost {
   };
 }
 
-export interface LinkedInResponse<T> {
+export interface LinkedInResponse {
   id: string;
   status?: number;
 }

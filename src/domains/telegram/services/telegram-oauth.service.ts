@@ -1,104 +1,96 @@
 /**
- * Telegram OAuth Service Implementation
+ * Telegram OAuth Service (Telegram Login Widget)
  *
- * Note: Telegram uses a different auth approach called "Telegram Login Widget"
- * This service is designed for bot-based authentication
+ * Telegram uses the Telegram Login Widget rather than traditional OAuth.
+ * The widget authenticates the user client-side and posts an auth payload
+ * back to the app. This service generates the widget URL and acts as a
+ * compatibility shim against IOAuthService.
  */
 
-import type {
-  IOAuthService,
-  OAuthTokens,
-  PlatformConfig,
-} from "../../core";
-import {
-  ConfigurationError,
-  NetworkError,
-} from "../../../domain/errors";
-import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
+import type { PlatformConfig, SocialPlatform } from "../../../domain/types";
+import { BaseOAuthService, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";
+import type { ISessionStorage } from "../../core/session/repositories/session-storage.interface";
+import { HttpClient } from "../../../infrastructure/http/http-client.util";
+import { CryptoUtils } from "../../../infrastructure/utils/crypto.util";
+import { NetworkError } from "../../../domain/errors";
+import type { OAuthTokenResponse } from "../../core/oauth/services/oauth-service.interface";
 
-export class TelegramOAuthService implements IOAuthService {
-  private config: PlatformConfigEntity;
-
-  constructor(config: PlatformConfig) {
-    this.config = config instanceof PlatformConfigEntity ? config : new PlatformConfigEntity(config);
-
-    if (!this.config.validate()) {
-      throw new ConfigurationError("telegram", "Invalid Telegram bot configuration");
-    }
+export class TelegramOAuthService extends BaseOAuthService {
+  constructor(
+    config: PlatformConfig,
+    http: HttpClient = new HttpClient(),
+    storage: ISessionStorage | null = null
+  ) {
+    super("telegram", config, http, storage);
   }
 
-  async generateAuthorizationUrl(platform: string, userId?: string): Promise<{
-    url: string;
-    state: string;
-  }> {
-    // Telegram uses Telegram Login Widget, not traditional OAuth
-    // This returns the widget URL
-    try {
-      const state = crypto.randomUUID();
-      const botUsername = this.config.oAuth.clientId; // clientId stores bot username
+  protected supportsPKCE(): boolean {
+    return false;
+  }
 
-      const url = new URL("https://telegram.org/js/telegram-widget.js");
-      url.searchParams.set("bot", botUsername);
-      url.searchParams.set("origin", window.location.origin);
+  protected supportsRefreshToken(): boolean {
+    return false;
+  }
+
+  protected supportsRevoke(): boolean {
+    return false;
+  }
+
+  protected getAuthorizationParams(state: string): AuthorizationUrlParams {
+    return {
+      client_id: this.config.oAuth.clientId, // bot username stored in clientId
+      redirect_uri: "",
+      response_type: "code",
+      scope: "",
+      state,
+    };
+  }
+
+  protected getAuthorizationEndpoint(): string {
+    return "https://telegram.org/js/telegram-widget.js";
+  }
+
+  protected getTokenRequestBody(_code: string, _redirectUri: string) {
+    // Telegram widget bypasses the standard code-for-token exchange.
+    return { grant_type: "telegram_widget" };
+  }
+
+  async generateAuthorizationUrl(platform: SocialPlatform, userId?: string) {
+    try {
+      const state = CryptoUtils.generateState();
+      const url = new URL(this.getAuthorizationEndpoint());
+      url.searchParams.set("bot", this.config.oAuth.clientId);
+      url.searchParams.set("origin", typeof window !== "undefined" ? window.location.origin : "");
       url.searchParams.set("request_access", "write");
 
-      return {
-        url: url.toString(),
-        state,
-      };
+      if (this.storage) {
+        await this.storage.setOAuthState(state, {
+          state,
+          timestamp: Date.now(),
+          platform,
+          userId,
+        });
+      }
+
+      return { url: url.toString(), state };
     } catch (error) {
       throw new NetworkError(
-        "telegram",
-        error instanceof Error ? error.message : "Failed to generate authorization URL",
+        this.platform,
+        error instanceof Error ? error.message : "Failed to generate Telegram widget URL",
         error
       );
     }
   }
 
-  async exchangeCodeForToken(
-    platform: string,
-    code: string,
-    state: string,
-    redirectUri: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    // Telegram doesn't use traditional OAuth token exchange
-    // The auth data comes from the widget callback
-    // This is a placeholder for compatibility with the interface
-    return {
-      accessToken: code,
-      refreshToken: undefined,
-      expiresIn: undefined,
-    };
+  async exchangeCodeForToken(): Promise<OAuthTokenResponse> {
+    return { accessToken: "", expiresIn: undefined };
   }
 
-  async refreshToken(
-    platform: string,
-    refreshToken: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    // Telegram doesn't use refresh tokens
-    return {
-      accessToken: refreshToken,
-      refreshToken,
-      expiresIn: undefined,
-    };
+  async refreshToken(): Promise<OAuthTokenResponse> {
+    return { accessToken: "", expiresIn: undefined };
   }
 
-  async revokeToken(platform: string, token: string): Promise<void> {
-    // Telegram doesn't have token revocation
-    // Tokens are managed by Telegram
-  }
-
-  async validateState(state: string): Promise<boolean> {
-    return true;
-  }
-
-  async generatePKCEChallenge(): Promise<{
-    codeVerifier: string;
-    codeChallenge: string;
-  }> {
-    return {
-      codeVerifier: "",
-      codeChallenge: "",
-    };
+  async revokeToken(): Promise<void> {
+    // Telegram does not expose a token-revocation endpoint.
   }
 }
