@@ -1,202 +1,127 @@
 /**
- * Telegram API Service (Bot-based)
+ * Telegram Bot API Service
+ *
+ * Telegram does not use bearer tokens. All requests are authenticated with
+ * the bot token in the URL. Response shape is `{ ok, result, error_code,
+ * description }`. Errors are normalized through the base class.
  */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type {
   TelegramUser,
-  TelegramChat,
   TelegramMessage,
   TelegramFile,
   TelegramResponse,
 } from "../types/telegram.types";
+import { BaseApiService } from "../../core/api/services/base-api.service";
+import { HttpClient } from "../../../infrastructure/http/http-client.util";
 
-export class TelegramApiService {
-  private baseUrl: string;
+export class TelegramApiService extends BaseApiService {
+  constructor(http: HttpClient = new HttpClient()) {
+    super(http);
+  }
 
-  constructor() {
-    this.baseUrl = "https://api.telegram.org";
+  protected baseUrl(): string {
+    return "https://api.telegram.org";
   }
 
   /**
-   * Get bot info
+   * Telegram responses wrap data in `{ ok, result, error_code, description }`.
    */
-  async getBotInfo(botToken: string): Promise<SocialApiResponse<TelegramUser>> {
+  private async callTelegram<T>(
+    botToken: string,
+    method: string,
+    params: Record<string, string> = {}
+  ): Promise<SocialApiResponse<T>> {
     try {
-      const response = await fetch(`${this.baseUrl}/bot${botToken}/getMe`);
-
-      const data = (await response.json()) as TelegramResponse<TelegramUser>;
+      const qs = new URLSearchParams(params).toString();
+      const path = `/bot${botToken}/${method}${qs ? `?${qs}` : ""}`;
+      const response = await this.http.fetch(this.url(path), { method: "GET" });
+      const data = (await response.json()) as TelegramResponse<T>;
 
       if (!data.ok) {
         return {
           success: false,
           error: {
-            code: data.error_code?.toString() || "UNKNOWN",
-            message: data.description || "Failed to get bot info",
+            code: data.error_code ? String(data.error_code) : "UNKNOWN",
+            message: data.description ?? `Telegram ${method} failed`,
           },
         };
       }
 
-      return {
-        success: true,
-        data: data.result!,
-      };
+      if (data.result === undefined || data.result === null) {
+        return {
+          success: false,
+          error: { code: "EMPTY_RESULT", message: "Telegram returned an empty result" },
+        };
+      }
+
+      return { success: true, data: data.result };
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: "NETWORK_ERROR",
-          message: error instanceof Error ? error.message : "Network error occurred",
-          details: error,
-        },
-      };
+      return { success: false, error: this.toApiError(error, "Network error occurred") };
     }
   }
 
-  /**
-   * Get bot's updates (messages)
-   */
+  async getBotInfo(botToken: string): Promise<SocialApiResponse<TelegramUser>> {
+    return this.callTelegram<TelegramUser>(botToken, "getMe");
+  }
+
   async getUpdates(
     botToken: string,
     offset: number = 0,
     limit: number = 100
   ): Promise<SocialApiResponse<TelegramMessage[]>> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/bot${botToken}/getUpdates?offset=${offset}&limit=${limit}`
-      );
-
-      const data = (await response.json()) as TelegramResponse<TelegramMessage[]>;
-
-      if (!data.ok) {
-        return {
-          success: false,
-          error: {
-            code: data.error_code?.toString() || "UNKNOWN",
-            message: data.description || "Failed to get updates",
-          },
-        };
-      }
-
-      return {
-        success: true,
-        data: data.result || [],
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: "NETWORK_ERROR",
-          message: error instanceof Error ? error.message : "Network error occurred",
-          details: error,
-        },
-      };
-    }
+    return this.callTelegram<TelegramMessage[]>(botToken, "getUpdates", {
+      offset: String(offset),
+      limit: String(limit),
+    }).then((response) => ({
+      success: response.success,
+      data: response.success ? (response.data ?? []) : undefined,
+      ...(response.success ? {} : { error: response.error }),
+    }));
   }
 
-  /**
-   * Send a message
-   */
   async sendMessage(
     botToken: string,
     chatId: string,
     content: SocialPostContent
   ): Promise<SocialApiResponse<{ message_id: number }>> {
+    const hasMedia = content.media && content.media.length > 0;
+    const method = hasMedia ? "sendPhoto" : "sendMessage";
+    const body: Record<string, string> = hasMedia
+      ? { chat_id: chatId, photo: content.media![0].url, caption: content.text }
+      : { chat_id: chatId, text: content.text };
+
     try {
-      const body: Record<string, unknown> = {
-        chat_id: chatId,
-        text: content.text,
-      };
-
-      if (content.media && content.media.length > 0) {
-        body.photo = content.media[0].url;
-        if (content.text) {
-          body.caption = content.text;
-        }
-        delete body.text;
-      }
-
-      const method = content.media ? "sendPhoto" : "sendMessage";
-      const response = await fetch(`${this.baseUrl}/bot${botToken}/${method}`, {
+      const response = await this.http.fetch(this.url(`/bot${botToken}/${method}`), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
       const data = (await response.json()) as TelegramResponse<TelegramMessage>;
-
-      if (!data.ok) {
+      if (!data.ok || !data.result) {
         return {
           success: false,
           error: {
-            code: data.error_code?.toString() || "UNKNOWN",
-            message: data.description || "Failed to send message",
+            code: data.error_code ? String(data.error_code) : "UNKNOWN",
+            message: data.description ?? `Telegram ${method} failed`,
           },
         };
       }
-
-      return {
-        success: true,
-        data: { message_id: data.result!.message_id },
-      };
+      return { success: true, data: { message_id: data.result.message_id } };
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: "NETWORK_ERROR",
-          message: error instanceof Error ? error.message : "Network error occurred",
-          details: error,
-        },
-      };
+      return { success: false, error: this.toApiError(error, "Network error occurred") };
     }
   }
 
-  /**
-   * Get file info
-   */
   async getFile(
     botToken: string,
     fileId: string
   ): Promise<SocialApiResponse<TelegramFile>> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/bot${botToken}/getFile?file_id=${fileId}`
-      );
-
-      const data = (await response.json()) as TelegramResponse<TelegramFile>;
-
-      if (!data.ok) {
-        return {
-          success: false,
-          error: {
-            code: data.error_code?.toString() || "UNKNOWN",
-            message: data.description || "Failed to get file",
-          },
-        };
-      }
-
-      return {
-        success: true,
-        data: data.result!,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: "NETWORK_ERROR",
-          message: error instanceof Error ? error.message : "Network error occurred",
-          details: error,
-        },
-      };
-    }
+    return this.callTelegram<TelegramFile>(botToken, "getFile", { file_id: fileId });
   }
 
-  /**
-   * Get file URL
-   */
   getFileUrl(botToken: string, filePath: string): string {
-    return `${this.baseUrl}/file/bot${botToken}/${filePath}`;
+    return `${this.baseUrl()}/file/bot${botToken}/${filePath}`;
   }
 }

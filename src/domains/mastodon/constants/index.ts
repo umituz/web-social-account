@@ -1,8 +1,5 @@
 /**
- * Mastodon constants
+ * Mastodon constants exports
  */
 
-// TODO: Implement Mastodon constants
-
-// Placeholder export to make this a valid module
-export const Mastodon_CONSTANTS_PLACEHOLDER = true;
+export * from "./mastodon.constants";

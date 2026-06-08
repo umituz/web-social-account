@@ -7,6 +7,8 @@ export * from "./account";
 export * from "./session";
 export * from "./config";
 export * from "./constants";
+export * from "./platform";
+export * from "./api";
 
 // Re-export core types from domain/types for convenience
 export type {

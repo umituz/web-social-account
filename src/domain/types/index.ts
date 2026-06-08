@@ -21,8 +21,6 @@ export type SocialPlatform =
 // OAuth flow types
 export type OAuthResponseType = "code" | "token";
 
-export type OAuthResponseTypeValue = OAuthResponseType;
-
 export type PKCECodeChallengeMethod = "plain" | "S256";
 
 // Account status

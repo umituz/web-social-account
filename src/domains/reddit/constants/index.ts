@@ -1,8 +1,5 @@
 /**
- * Reddit constants
+ * Reddit constants exports
  */
 
-// TODO: Implement Reddit constants
-
-// Placeholder export to make this a valid module
-export const Reddit_CONSTANTS_PLACEHOLDER = true;
+export * from "./reddit.constants";

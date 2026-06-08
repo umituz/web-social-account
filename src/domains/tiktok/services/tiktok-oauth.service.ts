@@ -1,160 +1,64 @@
 /**
- * TikTok OAuth Service Implementation
+ * TikTok OAuth Service
  */
 
-import type {
-  IOAuthService,
-  OAuthTokens,
-  PlatformConfig,
-} from "../../core";
-import {
-  OAuthError,
-  InvalidTokenError,
-  ConfigurationError,
-  NetworkError,
-} from "../../../domain/errors";
-import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
-import { TikTokError } from "../types";
+import type { PlatformConfig } from "../../../domain/types";
+import { BaseOAuthService, TokenRequestBody, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";
+import type { ISessionStorage } from "../../core/session/repositories/session-storage.interface";
+import { HttpClient } from "../../../infrastructure/http/http-client.util";
 
-export class TikTokOAuthService implements IOAuthService {
-  private config: PlatformConfigEntity;
+interface TikTokErrorBody {
+  error?: { message?: string; code?: string };
+}
 
-  constructor(config: PlatformConfig) {
-    this.config = config instanceof PlatformConfigEntity ? config : new PlatformConfigEntity(config);
-
-    if (!this.config.validate()) {
-      throw new ConfigurationError("tiktok", "Invalid TikTok OAuth configuration");
-    }
+export class TikTokOAuthService extends BaseOAuthService {
+  constructor(
+    config: PlatformConfig,
+    http: HttpClient = new HttpClient(),
+    storage: ISessionStorage | null = null
+  ) {
+    super("tiktok", config, http, storage);
   }
 
-  async generateAuthorizationUrl(platform: string, userId?: string): Promise<{
-    url: string;
-    state: string;
-  }> {
-    try {
-      const state = crypto.randomUUID();
-      const url = this.config.getAuthorizationUrl(state);
-
-      return {
-        url: url.toString(),
-        state,
-      };
-    } catch (error) {
-      throw new OAuthError(
-        "tiktok",
-        error instanceof Error ? error.message : "Failed to generate authorization URL",
-        error
-      );
-    }
-  }
-
-  async exchangeCodeForToken(
-    platform: string,
-    code: string,
-    state: string,
-    redirectUri: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("client_key", this.config.oAuth.clientId);
-      params.set("client_secret", this.config.oAuth.clientSecret);
-      params.set("code", code);
-      params.set("grant_type", "authorization_code");
-      params.set("redirect_uri", redirectUri);
-
-      const response = await fetch(this.config.oAuth.tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-
-      if (!response.ok) {
-        const error = (await response.json().catch(() => null)) as TikTokError;
-        throw new OAuthError("tiktok", error?.error?.message || "Token exchange failed", error);
-      }
-
-      const data = (await response.json()) as OAuthTokens & { open_id?: string };
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof OAuthError) throw error;
-      throw new NetworkError("tiktok", "Failed to exchange code for token", error);
-    }
-  }
-
-  async refreshToken(
-    platform: string,
-    refreshToken: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("client_key", this.config.oAuth.clientId);
-      params.set("client_secret", this.config.oAuth.clientSecret);
-      params.set("grant_type", "refresh_token");
-      params.set("refresh_token", refreshToken);
-
-      const response = await fetch(this.config.oAuth.tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-
-      if (!response.ok) {
-        throw new InvalidTokenError("tiktok", { refreshToken });
-      }
-
-      const data = (await response.json()) as OAuthTokens;
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof InvalidTokenError) throw error;
-      throw new NetworkError("tiktok", "Failed to refresh token", error);
-    }
-  }
-
-  async revokeToken(platform: string, token: string): Promise<void> {
-    try {
-      await fetch("https://open.tiktokapis.com/v2/oauth/revoke/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          access_token: token,
-        }),
-      });
-    } catch (error) {
-      throw new NetworkError("tiktok", "Failed to revoke token", error);
-    }
-  }
-
-  async validateState(state: string): Promise<boolean> {
-    return true;
-  }
-
-  async generatePKCEChallenge(): Promise<{
-    codeVerifier: string;
-    codeChallenge: string;
-  }> {
+  protected getAuthorizationParams(state: string): AuthorizationUrlParams {
     return {
-      codeVerifier: "",
-      codeChallenge: "",
+      response_type: this.config.oAuth.responseType ?? "code",
+      client_id: this.config.oAuth.clientId,
+      redirect_uri: this.config.oAuth.redirectUri,
+      scope: this.config.oAuth.scope.join(" "),
+      state,
     };
+  }
+
+  protected getTokenRequestBody(code: string, redirectUri: string): TokenRequestBody {
+    return {
+      client_key: this.config.oAuth.clientId,
+      client_secret: this.config.oAuth.clientSecret,
+      code,
+      grant_type: "authorization_code",
+      redirect_uri: redirectUri,
+    };
+  }
+
+  protected getRefreshTokenBody(refreshToken: string): TokenRequestBody {
+    return {
+      client_key: this.config.oAuth.clientId,
+      client_secret: this.config.oAuth.clientSecret,
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    };
+  }
+
+  protected getRevokeUrl(_token: string): string {
+    return "https://open.tiktokapis.com/v2/oauth/revoke/";
+  }
+
+  protected getRevokeBody(token: string): Record<string, string> {
+    return { access_token: token };
+  }
+
+  protected parseTokenError(data: unknown): string {
+    const body = data as TikTokErrorBody | null;
+    return body?.error?.message ?? "Token exchange failed";
   }
 }

@@ -1,8 +1,5 @@
 /**
- * Telegram constants
+ * Telegram constants exports
  */
 
-// TODO: Implement Telegram constants
-
-// Placeholder export to make this a valid module
-export const Telegram_CONSTANTS_PLACEHOLDER = true;
+export * from "./telegram.constants";

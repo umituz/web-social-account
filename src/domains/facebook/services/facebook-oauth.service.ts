@@ -1,148 +1,67 @@
 /**
- * Facebook OAuth Service Implementation
+ * Facebook OAuth Service
  */
 
-import type {
-  IOAuthService,
-  OAuthTokens,
-  PlatformConfig,
-} from "../../core";
-import {
-  OAuthError,
-  InvalidTokenError,
-  ConfigurationError,
-  NetworkError,
-} from "../../../domain/errors";
-import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
-import { FacebookError } from "../types";
+import type { PlatformConfig } from "../../../domain/types";
+import { BaseOAuthService, TokenRequestBody, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";
+import type { ISessionStorage } from "../../core/session/repositories/session-storage.interface";
+import { HttpClient } from "../../../infrastructure/http/http-client.util";
 
-export class FacebookOAuthService implements IOAuthService {
-  private config: PlatformConfigEntity;
+interface FacebookErrorBody {
+  error?: { message?: string };
+}
 
-  constructor(config: PlatformConfig) {
-    this.config = config instanceof PlatformConfigEntity ? config : new PlatformConfigEntity(config);
-
-    if (!this.config.validate()) {
-      throw new ConfigurationError("facebook", "Invalid Facebook OAuth configuration");
-    }
+export class FacebookOAuthService extends BaseOAuthService {
+  constructor(
+    config: PlatformConfig,
+    http: HttpClient = new HttpClient(),
+    storage: ISessionStorage | null = null
+  ) {
+    super("facebook", config, http, storage);
   }
 
-  async generateAuthorizationUrl(platform: string, userId?: string): Promise<{
-    url: string;
-    state: string;
-  }> {
-    try {
-      const state = crypto.randomUUID();
-      const url = this.config.getAuthorizationUrl(state);
-
-      return {
-        url: url.toString(),
-        state,
-      };
-    } catch (error) {
-      throw new OAuthError(
-        "facebook",
-        error instanceof Error ? error.message : "Failed to generate authorization URL",
-        error
-      );
-    }
+  protected getAuthorizationParams(state: string): AuthorizationUrlParams {
+    return {
+      response_type: this.config.oAuth.responseType ?? "code",
+      client_id: this.config.oAuth.clientId,
+      redirect_uri: this.config.oAuth.redirectUri,
+      scope: this.config.oAuth.scope.join(" "),
+      state,
+    };
   }
 
-  async exchangeCodeForToken(
-    platform: string,
-    code: string,
-    state: string,
-    redirectUri: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("code", code);
-      params.set("redirect_uri", redirectUri);
-      params.set("client_id", this.config.oAuth.clientId);
-      params.set("client_secret", this.config.oAuth.clientSecret);
-
-      const response = await fetch(this.config.oAuth.tokenUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
-
-      if (!response.ok) {
-        const error = (await response.json().catch(() => null)) as FacebookError;
-        throw new OAuthError("facebook", error?.error?.message || "Token exchange failed", error);
-      }
-
-      const data = (await response.json()) as OAuthTokens;
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof OAuthError) throw error;
-      throw new NetworkError("facebook", "Failed to exchange code for token", error);
-    }
+  protected getTokenRequestBody(code: string, redirectUri: string): TokenRequestBody {
+    return {
+      code,
+      redirect_uri: redirectUri,
+      client_id: this.config.oAuth.clientId,
+      client_secret: this.config.oAuth.clientSecret,
+    };
   }
 
-  async refreshToken(
-    platform: string,
-    refreshToken: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("grant_type", "fb_exchange_token");
-      params.set("fb_exchange_token", refreshToken);
-      params.set("client_id", this.config.oAuth.clientId);
-      params.set("client_secret", this.config.oAuth.clientSecret);
-
-      const response = await fetch(this.config.oAuth.tokenUrl, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new InvalidTokenError("facebook", { refreshToken });
-      }
-
-      const data = (await response.json()) as OAuthTokens;
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof InvalidTokenError) throw error;
-      throw new NetworkError("facebook", "Failed to refresh token", error);
-    }
+  protected getRefreshTokenBody(refreshToken: string): TokenRequestBody {
+    return {
+      grant_type: "fb_exchange_token",
+      fb_exchange_token: refreshToken,
+      client_id: this.config.oAuth.clientId,
+      client_secret: this.config.oAuth.clientSecret,
+    };
   }
 
-  async revokeToken(platform: string, token: string): Promise<void> {
-    try {
-      await fetch(`https://graph.facebook.com/v18.0/${token}/permissions`, {
-        method: "DELETE",
-      });
-    } catch (error) {
-      throw new NetworkError("facebook", "Failed to revoke token", error);
-    }
-  }
-
-  async validateState(state: string): Promise<boolean> {
+  protected usesQueryForTokenRequest(): boolean {
     return true;
   }
 
-  async generatePKCEChallenge(): Promise<{
-    codeVerifier: string;
-    codeChallenge: string;
-  }> {
-    return {
-      codeVerifier: "",
-      codeChallenge: "",
-    };
+  protected getRevokeUrl(token: string): string {
+    return `https://graph.facebook.com/v18.0/${token}/permissions`;
+  }
+
+  protected getRevokeBody(_token: string): Record<string, string> {
+    return {};
+  }
+
+  protected parseTokenError(data: unknown): string {
+    const body = data as FacebookErrorBody | null;
+    return body?.error?.message ?? "Token exchange failed";
   }
 }

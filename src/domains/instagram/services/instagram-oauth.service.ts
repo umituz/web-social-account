@@ -1,152 +1,70 @@
 /**
- * Instagram OAuth Service Implementation
+ * Instagram OAuth Service
  */
 
-import type {
-  IOAuthService,
-  OAuthTokens,
-  PlatformConfig,
-} from "../../core";
-import {
-  OAuthError,
-  InvalidTokenError,
-  ConfigurationError,
-  NetworkError,
-} from "../../../domain/errors";
-import { PlatformConfigEntity } from "../../core/config/entities/platform-config.entity";
-import { InstagramError } from "../types";
+import type { PlatformConfig } from "../../../domain/types";
+import { BaseOAuthService, TokenRequestBody, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";
+import type { ISessionStorage } from "../../core/session/repositories/session-storage.interface";
+import { HttpClient } from "../../../infrastructure/http/http-client.util";
 
-export class InstagramOAuthService implements IOAuthService {
-  private config: PlatformConfigEntity;
+interface InstagramErrorBody {
+  error?: { message?: string };
+}
 
-  constructor(config: PlatformConfig) {
-    this.config = config instanceof PlatformConfigEntity ? config : new PlatformConfigEntity(config);
-
-    if (!this.config.validate()) {
-      throw new ConfigurationError("instagram", "Invalid Instagram OAuth configuration");
-    }
+export class InstagramOAuthService extends BaseOAuthService {
+  constructor(
+    config: PlatformConfig,
+    http: HttpClient = new HttpClient(),
+    storage: ISessionStorage | null = null
+  ) {
+    super("instagram", config, http, storage);
   }
 
-  async generateAuthorizationUrl(platform: string, userId?: string): Promise<{
-    url: string;
-    state: string;
-  }> {
-    try {
-      const state = crypto.randomUUID();
-      const url = this.config.getAuthorizationUrl(state);
-
-      return {
-        url: url.toString(),
-        state,
-      };
-    } catch (error) {
-      throw new OAuthError(
-        "instagram",
-        error instanceof Error ? error.message : "Failed to generate authorization URL",
-        error
-      );
-    }
-  }
-
-  async exchangeCodeForToken(
-    platform: string,
-    code: string,
-    state: string,
-    redirectUri: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("grant_type", "authorization_code");
-      params.set("code", code);
-      params.set("redirect_uri", redirectUri);
-      params.set("client_id", this.config.oAuth.clientId);
-      params.set("client_secret", this.config.oAuth.clientSecret);
-
-      const response = await fetch(this.config.oAuth.tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-
-      if (!response.ok) {
-        const error = (await response.json().catch(() => null)) as InstagramError;
-        throw new OAuthError("instagram", error?.error?.message || "Token exchange failed", error);
-      }
-
-      const data = (await response.json()) as OAuthTokens & { user_id?: number };
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof OAuthError) throw error;
-      throw new NetworkError("instagram", "Failed to exchange code for token", error);
-    }
-  }
-
-  async refreshToken(
-    platform: string,
-    refreshToken: string
-  ): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> {
-    try {
-      const params = new URLSearchParams();
-      params.set("grant_type", "ig_refresh_token");
-      params.set("access_token", refreshToken);
-
-      const response = await fetch("https://graph.instagram.com/refresh_access_token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-
-      if (!response.ok) {
-        throw new InvalidTokenError("instagram", { refreshToken });
-      }
-
-      const data = (await response.json()) as OAuthTokens;
-
-      const expiresIn = data.expiresIn ?? undefined;
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken ?? refreshToken,
-        expiresIn,
-      };
-    } catch (error) {
-      if (error instanceof InvalidTokenError) throw error;
-      throw new NetworkError("instagram", "Failed to refresh token", error);
-    }
-  }
-
-  async revokeToken(platform: string, token: string): Promise<void> {
-    try {
-      await fetch(`https://graph.instagram.com/${token}?access_token=${token}`, {
-        method: "DELETE",
-      });
-    } catch (error) {
-      throw new NetworkError("instagram", "Failed to revoke token", error);
-    }
-  }
-
-  async validateState(state: string): Promise<boolean> {
-    return true;
-  }
-
-  async generatePKCEChallenge(): Promise<{
-    codeVerifier: string;
-    codeChallenge: string;
-  }> {
+  protected getAuthorizationParams(state: string): AuthorizationUrlParams {
     return {
-      codeVerifier: "",
-      codeChallenge: "",
+      response_type: this.config.oAuth.responseType ?? "code",
+      client_id: this.config.oAuth.clientId,
+      redirect_uri: this.config.oAuth.redirectUri,
+      scope: this.config.oAuth.scope.join(" "),
+      state,
     };
+  }
+
+  protected getTokenRequestBody(code: string, redirectUri: string): TokenRequestBody {
+    return {
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: redirectUri,
+      client_id: this.config.oAuth.clientId,
+      client_secret: this.config.oAuth.clientSecret,
+    };
+  }
+
+  protected getRefreshTokenBody(refreshToken: string): TokenRequestBody {
+    return {
+      grant_type: "ig_refresh_token",
+      access_token: refreshToken,
+    };
+  }
+
+  protected getTokenUrl(): string {
+    return "https://graph.instagram.com/refresh_access_token";
+  }
+
+  protected buildTokenRequestHeaders(): Record<string, string> {
+    return { "Content-Type": "application/x-www-form-urlencoded" };
+  }
+
+  protected getRevokeUrl(token: string): string {
+    return `https://graph.instagram.com/${token}?access_token=${token}`;
+  }
+
+  protected getRevokeBody(_token: string): Record<string, string> {
+    return {};
+  }
+
+  protected parseTokenError(data: unknown): string {
+    const body = data as InstagramErrorBody | null;
+    return body?.error?.message ?? "Token exchange failed";
   }
 }

@@ -1,8 +1,5 @@
 /**
- * Medium constants
+ * Medium constants exports
  */
 
-// TODO: Implement Medium constants
-
-// Placeholder export to make this a valid module
-export const Medium_CONSTANTS_PLACEHOLDER = true;
+export * from "./medium.constants";
