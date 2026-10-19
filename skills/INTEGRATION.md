@@ -244,51 +244,37 @@ export default async function DashboardPage() {
 
 ## 🔄 Diğer @umituz Paketleriyle Kullanım
 
-### @umituz/web-firebase ile
-
-```tsx
-import { autoInitializeFirebase } from "@umituz/web-firebase";
-import { SocialAccountProvider } from "@umituz/web-social-account";
-import { LocalizationProvider } from "@umituz/web-localization";
-
-// Firebase başlat
-await autoInitializeFirebase();
-
-function App() {
-  return (
-    <LocalizationProvider locale="tr">
-      <FirebaseAuthProvider>
-        <SocialAccountProvider config={config}>
-          <YourApp />
-        </SocialAccountProvider>
-      </FirebaseAuthProvider>
-    </LocalizationProvider>
-  );
-}
-```
-
 ### Custom Storage Adapter
 
 ```typescript
 // lib/firebase-storage.adapter.ts
 import type { ISessionStorage } from "@umituz/web-social-account/core/session";
-import { firestore } from "@umituz/web-firebase";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  deleteDoc,
+} from "firebase/firestore";
+
+const db = getFirestore();
 
 export class FirestoreStorageAdapter implements ISessionStorage {
   async setOAuthState(key: string, state: any): Promise<void> {
-    await firestore.collection("oauth_states").doc(key).set({
+    await setDoc(doc(collection(db, "oauth_states"), key), {
       ...state,
       createdAt: new Date(),
     });
   }
 
   async getOAuthState(key: string): Promise<any | null> {
-    const doc = await firestore.collection("oauth_states").doc(key).get();
-    return doc.exists ? doc.data() : null;
+    const snap = await getDoc(doc(collection(db, "oauth_states"), key));
+    return snap.exists() ? snap.data() : null;
   }
 
   async removeOAuthState(key: string): Promise<void> {
-    await firestore.collection("oauth_states").doc(key).delete();
+    await deleteDoc(doc(collection(db, "oauth_states"), key));
   }
 
   // ... other methods

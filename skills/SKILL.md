@@ -27,7 +27,7 @@ Bu skill, web uygulamalarına 13 farklı sosyal medya platformunu entegre etmeni
 npm install @umituz/web-social-account
 
 # veya diğer @umituz paketleriyle birlikte
-npm install @umituz/web-social-account @umituz/web-firebase @umituz/web-localization
+npm install @umituz/web-social-account @umituz/web-localization
 ```
 
 ## 💡 Temel Kullanım
@@ -134,24 +134,6 @@ INSTAGRAM_CLIENT_SECRET=your_instagram_client_secret
 ```
 
 ## 📦 Diğer @umituz Paketleriyle Entegrasyon
-
-### @umituz/web-firebase ile
-
-```typescript
-import { autoInitializeFirebase } from "@umituz/web-firebase";
-import { SocialAccountProvider } from "@umituz/web-social-account";
-
-// Firebase'i başlat
-await autoInitializeFirebase();
-
-function App() {
-  return (
-    <SocialAccountProvider config={config}>
-      {/* Social account + Firebase auth */}
-    </SocialAccountProvider>
-  );
-}
-```
 
 ### @umituz/web-localization ile
 
