@@ -1,6 +1,3 @@
-/**
- * YouTube-specific types
- */
 
 export interface YouTubeChannel {
   id: string;
@@ -59,9 +56,6 @@ export interface youtubeError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Youtube OAuth/API Error
- */
 export class YouTubeError extends Error {
   constructor(
     message: string,

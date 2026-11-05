@@ -1,6 +1,3 @@
-/**
- * Pinterest API Service
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { PinterestUser, PinterestBoard, PinterestPin } from "../types/pinterest.types";

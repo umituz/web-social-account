@@ -1,9 +1,3 @@
-/**
- * HTTP Client — retry, timeout, caching, and request deduplication.
- *
- * Numeric defaults and math are sourced from `shared/limits` and
- * `shared/calculations` so this file contains no magic numbers.
- */
 
 import { HTTP_DEFAULTS } from "../../shared/limits/http-defaults";
 import {
@@ -258,7 +252,6 @@ export class HttpClient {
           const error = await response.json();
           errorMessage = error.message || error.detail || JSON.stringify(error);
         } catch {
-          // Use status text if JSON parsing fails
         }
       }
       throw new Error(errorMessage);

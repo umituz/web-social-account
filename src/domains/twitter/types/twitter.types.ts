@@ -1,6 +1,3 @@
-/**
- * Twitter-specific types
- */
 
 export interface TwitterUser {
   id: string;

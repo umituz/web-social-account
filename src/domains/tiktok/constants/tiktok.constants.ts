@@ -1,13 +1,9 @@
-/**
- * TikTok API Constants
- */
 
 export const TIKTOK_API_ENDPOINTS = {
   BASE_URL: "https://open.tiktokapis.com/v2",
   AUTHORIZATION_URL: "https://open.tiktokapis.com/v2/oauth/authorize",
   TOKEN_URL: "https://open.tiktokapis.com/v2/oauth/token",
 
-  // API endpoints
   USER_INFO: "/user/info/",
   VIDEO_LIST: "/video/list/",
   VIDEO_UPLOAD: "/video/publish/",

@@ -1,6 +1,3 @@
-/**
- * Facebook OAuth Service
- */
 
 import type { PlatformConfig } from "../../../domain/types";
 import { BaseOAuthService, TokenRequestBody, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";

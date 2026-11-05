@@ -1,10 +1,4 @@
-/**
- * @umituz/web-social-account
- *
- * Comprehensive social media account management with domain-based architecture
- */
 
-// Domain exports
 export * from "./domains/core";
 export * from "./domains/twitter";
 export * from "./domains/linkedin";
@@ -20,11 +14,8 @@ export * from "./domains/telegram";
 export * from "./domains/mastodon";
 export * from "./domains/medium";
 
-// Application exports
 export * from "./application/hooks";
 
-// Presentation exports
 export * from "./presentation/providers";
 
-// Infrastructure exports
 export * from "./infrastructure";

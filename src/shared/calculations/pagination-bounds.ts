@@ -1,9 +1,3 @@
-/**
- * Pagination bound clamping.
- *
- * Centralizes the "clamp a user-supplied count into a safe range" math
- * used by every API service that supports pagination.
- */
 
 export interface ClampParams {
   requested: number;
@@ -12,10 +6,6 @@ export interface ClampParams {
   max: number;
 }
 
-/**
- * Returns `requested` clamped to `[min, max]`. Falls back to `defaultValue`
- * when `requested` is not a positive number.
- */
 export const clampRequestedCount = ({
   requested,
   defaultValue,

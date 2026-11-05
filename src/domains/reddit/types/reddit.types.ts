@@ -1,6 +1,3 @@
-/**
- * Reddit-specific types
- */
 
 export interface RedditUser {
   id: string;
@@ -56,9 +53,6 @@ export interface redditError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Reddit OAuth/API Error
- */
 export class RedditError extends Error {
   constructor(
     message: string,

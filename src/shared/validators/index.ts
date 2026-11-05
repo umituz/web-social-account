@@ -1,6 +1,3 @@
-/**
- * Validators module barrel
- */
 
 export * from "./email-shape.validator";
 export * from "./url-shape.validator";

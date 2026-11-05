@@ -1,9 +1,13 @@
-/**
- * Tests for HttpClient
- */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { HttpClient } from "../../../src/infrastructure/http/http-client.util";
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
 
 describe("HttpClient", () => {
   let httpClient: HttpClient;
@@ -16,10 +20,9 @@ describe("HttpClient", () => {
   });
 
   it("should make GET request", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: "test" }),
-    });
+    mockFetch.mockResolvedValueOnce(
+      jsonResponse({ data: "test" })
+    );
 
     const result = await httpClient.get<{ data: string }>("https://api.example.com/test");
 
@@ -28,10 +31,9 @@ describe("HttpClient", () => {
   });
 
   it("should make POST request", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
+    mockFetch.mockResolvedValueOnce(
+      jsonResponse({ success: true })
+    );
 
     const result = await httpClient.post<{ success: boolean }>(
       "https://api.example.com/create",
@@ -46,10 +48,7 @@ describe("HttpClient", () => {
     mockFetch
       .mockRejectedValueOnce(new Error("Network error"))
       .mockRejectedValueOnce(new Error("Network error"))
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ data: "retry-success" }),
-      });
+      .mockResolvedValueOnce(jsonResponse({ data: "retry-success" }));
 
     const result = await httpClient.get<{ data: string }>("https://api.example.com/test");
 
@@ -58,10 +57,18 @@ describe("HttpClient", () => {
   });
 
   it("should timeout after specified time", async () => {
-    mockFetch.mockImplementationOnce(() => new Promise(() => {})); // Never resolves
+    const shortClient = new HttpClient(30, 0);
+    mockFetch.mockImplementationOnce(
+      (_url: string, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init.signal?.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError"))
+          );
+        })
+    );
 
     await expect(
-      httpClient.get("https://api.example.com/test")
-    ).rejects.toThrow("Request timeout after 5000ms");
+      shortClient.get("https://api.example.com/test")
+    ).rejects.toThrow("Request timeout after 30ms");
   });
 });

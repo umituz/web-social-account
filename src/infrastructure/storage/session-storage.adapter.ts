@@ -1,6 +1,3 @@
-/**
- * SessionStorage Adapter for OAuth State and Session Data
- */
 
 import { BaseStorageAdapter, StorageLike } from "./base-storage.adapter";
 

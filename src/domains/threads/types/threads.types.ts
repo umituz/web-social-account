@@ -1,6 +1,3 @@
-/**
- * Threads-specific types
- */
 
 export interface ThreadsUser {
   id: string;
@@ -45,9 +42,6 @@ export interface threadsError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Threads OAuth/API Error
- */
 export class ThreadsError extends Error {
   constructor(
     message: string,

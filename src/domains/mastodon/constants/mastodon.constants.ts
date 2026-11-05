@@ -1,10 +1,3 @@
-/**
- * Mastodon API Constants
- *
- * Mastodon is federated: each instance has its own endpoints. The base
- * endpoints below are RELATIVE paths; the instance URL is prepended at
- * runtime by MastodonOAuthService / MastodonApiService.
- */
 
 export const MASTODON_API_ENDPOINTS = {
   AUTHORIZATION_PATH: "/oauth/authorize",

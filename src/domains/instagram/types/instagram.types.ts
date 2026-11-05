@@ -1,6 +1,3 @@
-/**
- * Instagram-specific types
- */
 
 export interface InstagramUser {
   id: string;
@@ -46,9 +43,6 @@ export interface instagramError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Instagram OAuth/API Error
- */
 export class InstagramError extends Error {
   constructor(
     message: string,

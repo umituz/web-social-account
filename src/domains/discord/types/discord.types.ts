@@ -1,6 +1,3 @@
-/**
- * Discord-specific types
- */
 
 export interface DiscordUser {
   id: string;
@@ -68,9 +65,6 @@ export interface DiscordApiError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Discord OAuth/API Error
- */
 export class DiscordError extends Error {
   constructor(
     message: string,

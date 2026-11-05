@@ -1,6 +1,3 @@
-/**
- * Custom error classes for social media account management
- */
 
 export class SocialAccountError extends Error {
   constructor(

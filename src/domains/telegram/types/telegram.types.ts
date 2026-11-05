@@ -1,6 +1,3 @@
-/**
- * Telegram-specific types
- */
 
 export interface TelegramUser {
   id: number;

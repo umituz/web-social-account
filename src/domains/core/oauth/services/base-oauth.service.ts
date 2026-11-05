@@ -1,9 +1,3 @@
-/**
- * Base OAuth Service - Template Method Pattern
- *
- * Provides the OAuth 2.0 authorization code flow skeleton.
- * Subclasses override only platform-specific extension points.
- */
 
 import type {
   SocialPlatform,
@@ -67,28 +61,16 @@ export abstract class BaseOAuthService implements IOAuthService {
     }
   }
 
-  /**
-   * Platform-specific authorization URL parameters
-   * Override to add extra params (e.g., access_type for Google)
-   */
   protected abstract getAuthorizationParams(
     state: string,
     codeChallenge?: string
   ): AuthorizationUrlParams;
 
-  /**
-   * Platform-specific token request body
-   * Override for different parameter names (e.g., client_key for TikTok)
-   */
   protected abstract getTokenRequestBody(
     code: string,
     redirectUri: string
   ): TokenRequestBody;
 
-  /**
-   * Platform-specific refresh token body
-   * Override for different parameter names
-   */
   protected getRefreshTokenBody(refreshToken: string): TokenRequestBody {
     return {
       grant_type: "refresh_token",
@@ -98,72 +80,42 @@ export abstract class BaseOAuthService implements IOAuthService {
     };
   }
 
-  /**
-   * Whether the platform supports PKCE
-   */
   protected supportsPKCE(): boolean {
     return this.config.oAuth.pkce === true;
   }
 
-  /**
-   * Whether the platform supports refresh tokens
-   */
   protected supportsRefreshToken(): boolean {
     return true;
   }
 
-  /**
-   * Whether the platform supports token revocation
-   */
   protected supportsRevoke(): boolean {
     return true;
   }
 
-  /**
-   * Whether the platform uses Basic Auth for token requests
-   */
   protected usesBasicAuth(): boolean {
     return false;
   }
 
-  /**
-   * Whether the platform uses query params for token requests (instead of body)
-   */
   protected usesQueryForTokenRequest(): boolean {
     return false;
   }
 
-  /**
-   * Override to provide a custom URL for token requests (e.g., Mastodon's instance URL)
-   */
   protected getTokenUrl(): string {
     return this.config.oAuth.tokenUrl;
   }
 
-  /**
-   * Override to provide a custom authorization URL
-   */
   protected getAuthorizationEndpoint(): string {
     return this.config.oAuth.authorizationUrl;
   }
 
-  /**
-   * Override to provide a custom revoke URL
-   */
   protected getRevokeUrl(_token: string): string {
     return this.config.oAuth.tokenUrl;
   }
 
-  /**
-   * Override to provide custom revoke body
-   */
   protected getRevokeBody(token: string): Record<string, string> {
     return { token };
   }
 
-  /**
-   * Override to parse token error responses (different error shapes per platform)
-   */
   protected parseTokenError(_data: unknown): string {
     return "Token exchange failed";
   }
@@ -190,7 +142,6 @@ export abstract class BaseOAuthService implements IOAuthService {
         }
       }
 
-      // Persist state for later validation
       if (this.storage) {
         await this.storage.setOAuthState(state, {
           state,

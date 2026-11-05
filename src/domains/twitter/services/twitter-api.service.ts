@@ -1,6 +1,3 @@
-/**
- * Twitter API Service
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { TwitterUser, TwitterTweet } from "../types/twitter.types";

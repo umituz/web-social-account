@@ -1,6 +1,3 @@
-/**
- * Instagram API Service
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { InstagramUser, InstagramMedia } from "../types/instagram.types";

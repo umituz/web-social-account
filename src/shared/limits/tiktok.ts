@@ -1,6 +1,3 @@
-/**
- * TikTok platform limits
- */
 
 import { secondsToMs } from "../time/duration";
 

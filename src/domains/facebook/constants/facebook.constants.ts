@@ -1,13 +1,9 @@
-/**
- * Facebook Graph API Constants
- */
 
 export const FACEBOOK_API_ENDPOINTS = {
   BASE_URL: "https://graph.facebook.com/v18.0",
   AUTHORIZATION_URL: "https://www.facebook.com/v18.0/dialog/oauth",
   TOKEN_URL: "https://graph.facebook.com/v18.0/oauth/access_token",
 
-  // API endpoints
   USER: "/me",
   USER_ACCOUNTS: "/me/accounts",
   PAGE_FEED: "/feed",

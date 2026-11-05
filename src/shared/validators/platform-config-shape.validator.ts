@@ -1,9 +1,3 @@
-/**
- * Platform-config shape validator.
- *
- * Ensures the `clientId`, `clientSecret`, and `redirectUri` are present
- * and that `redirectUri` is a syntactically valid URL.
- */
 
 import { hasValidUrlShape } from "./url-shape.validator";
 

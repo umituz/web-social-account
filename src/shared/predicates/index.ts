@@ -1,6 +1,3 @@
-/**
- * Predicates module barrel
- */
 
 export * from "./is-token-expired";
 export * from "./is-token-expiring-soon";

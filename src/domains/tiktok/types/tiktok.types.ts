@@ -1,6 +1,3 @@
-/**
- * TikTok-specific types
- */
 
 export interface TikTokUser {
   open_id: string;
@@ -50,9 +47,6 @@ export interface tiktokError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Tiktok OAuth/API Error
- */
 export class TikTokError extends Error {
   constructor(
     message: string,

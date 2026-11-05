@@ -1,13 +1,9 @@
-/**
- * Threads API Constants
- */
 
 export const THREADS_API_ENDPOINTS = {
   BASE_URL: "https://graph.threads.net/v1.0",
   AUTHORIZATION_URL: "https://threads.net/oauth/authorize",
   TOKEN_URL: "https://graph.threads.net/oauth/access_token",
 
-  // API endpoints
   USER: "/me",
   USER_THREADS: "/me/threads",
   THREADS_PUBLISH: "/threads",

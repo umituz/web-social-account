@@ -1,6 +1,3 @@
-/**
- * Medium API Constants
- */
 
 export const MEDIUM_API_ENDPOINTS = {
   BASE_URL: "https://api.medium.com/v1",

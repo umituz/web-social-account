@@ -1,11 +1,3 @@
-/**
- * Telegram OAuth Service (Telegram Login Widget)
- *
- * Telegram uses the Telegram Login Widget rather than traditional OAuth.
- * The widget authenticates the user client-side and posts an auth payload
- * back to the app. This service generates the widget URL and acts as a
- * compatibility shim against IOAuthService.
- */
 
 import type { PlatformConfig, SocialPlatform } from "../../../domain/types";
 import { BaseOAuthService, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";
@@ -38,7 +30,7 @@ export class TelegramOAuthService extends BaseOAuthService {
 
   protected getAuthorizationParams(state: string): AuthorizationUrlParams {
     return {
-      client_id: this.config.oAuth.clientId, // bot username stored in clientId
+      client_id: this.config.oAuth.clientId,
       redirect_uri: "",
       response_type: "code",
       scope: "",
@@ -51,7 +43,6 @@ export class TelegramOAuthService extends BaseOAuthService {
   }
 
   protected getTokenRequestBody(_code: string, _redirectUri: string) {
-    // Telegram widget bypasses the standard code-for-token exchange.
     return { grant_type: "telegram_widget" };
   }
 
@@ -91,6 +82,5 @@ export class TelegramOAuthService extends BaseOAuthService {
   }
 
   async revokeToken(): Promise<void> {
-    // Telegram does not expose a token-revocation endpoint.
   }
 }

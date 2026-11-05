@@ -1,6 +1,3 @@
-/**
- * Social Account Entity
- */
 
 import type {
   AccessToken,

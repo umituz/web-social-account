@@ -1,29 +1,18 @@
-/**
- * Twitter/X API Constants
- */
 
-/**
- * Twitter API endpoints
- */
 export const TWITTER_API_ENDPOINTS = {
   BASE_URL: "https://api.twitter.com/2",
   AUTH_BASE_URL: "https://twitter.com/i/oauth2",
 
-  // OAuth endpoints
   AUTHORIZATION_URL: "https://twitter.com/i/oauth2/authorize",
   TOKEN_URL: "https://api.twitter.com/2/oauth2/token",
   REVOKE_URL: "https://api.twitter.com/2/oauth2/revoke",
 
-  // API endpoints
   TWEETS: "/tweets",
   USER: "/users/me",
   USER_TIMELINE: "/users/me/tweets",
   MEDIA_UPLOAD: "https://upload.twitter.com/1.1/media/upload",
 } as const;
 
-/**
- * Twitter OAuth scopes
- */
 export const TWITTER_SCOPES = {
   READ: ["tweet.read", "users.read"],
   WRITE: ["tweet.write", "users.read"],
@@ -31,18 +20,12 @@ export const TWITTER_SCOPES = {
   FULL: ["tweet.read", "tweet.write", "users.read", "media.write", "offline.access"],
 } as const;
 
-/**
- * Twitter media types
- */
 export const TWITTER_MEDIA_TYPE = {
   IMAGE: "image",
   VIDEO: "video",
   GIF: "animated_gif",
 } as const;
 
-/**
- * Twitter tweet fields
- */
 export const TWITTER_TWEET_FIELDS = [
   "id",
   "text",
@@ -52,9 +35,6 @@ export const TWITTER_TWEET_FIELDS = [
   "entities",
 ] as const;
 
-/**
- * Twitter user fields
- */
 export const TWITTER_USER_FIELDS = [
   "id",
   "name",
@@ -66,9 +46,6 @@ export const TWITTER_USER_FIELDS = [
   "created_at",
 ] as const;
 
-/**
- * Twitter API limits
- */
 export const TWITTER_LIMITS = {
   MAX_TWEET_LENGTH: 280,
   MAX_MEDIA_PER_TWEET: 4,
@@ -77,9 +54,6 @@ export const TWITTER_LIMITS = {
   MAX_UPLOAD_SIZE_MB: 512,
 } as const;
 
-/**
- * Twitter API configuration
- */
 export const TWITTER_API_CONFIG = {
   VERSION: "2",
   TIMEOUT: 30000,

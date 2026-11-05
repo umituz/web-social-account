@@ -1,10 +1,3 @@
-/**
- * Mastodon OAuth Service
- *
- * Mastodon is federated: each instance has its own OAuth endpoint.
- * The instance URL is provided at construction time and used to compose
- * authorization, token, and revoke URLs.
- */
 
 import type { PlatformConfig } from "../../../domain/types";
 import { BaseOAuthService, TokenRequestBody, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";

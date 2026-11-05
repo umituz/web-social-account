@@ -1,6 +1,3 @@
-/**
- * Mastodon-specific types
- */
 
 export interface MastodonAccount {
   id: string;
@@ -75,9 +72,6 @@ export interface mastodonError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Mastodon OAuth/API Error
- */
 export class MastodonError extends Error {
   constructor(
     message: string,

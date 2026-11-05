@@ -1,6 +1,3 @@
-/**
- * YouTube API Service
- */
 
 import type { SocialApiResponse } from "../../../domain/types";
 import type { YouTubeChannel, YouTubeVideo } from "../types/youtube.types";

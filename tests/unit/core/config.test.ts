@@ -1,6 +1,3 @@
-/**
- * Tests for PlatformConfigEntity
- */
 
 import { describe, it, expect } from "vitest";
 import { PlatformConfigEntity } from "../../../src/domains/core/config/entities/platform-config.entity";

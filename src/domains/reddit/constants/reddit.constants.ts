@@ -1,6 +1,3 @@
-/**
- * Reddit API Constants
- */
 
 export const REDDIT_API_ENDPOINTS = {
   BASE_URL: "https://oauth.reddit.com",

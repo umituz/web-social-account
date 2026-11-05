@@ -1,9 +1,3 @@
-/**
- * Base API Service - Template Method Pattern
- *
- * Provides HTTP fetching, in-memory caching, and normalized error responses.
- * Subclasses override only the platform-specific endpoints and shapes.
- */
 
 import type { SocialApiResponse, SocialApiError } from "../../../../domain/types";
 import { HttpClient, HttpRequestOptions } from "../../../../infrastructure/http/http-client.util";
@@ -15,7 +9,6 @@ export interface CacheKeyContext {
 }
 
 export interface RequestOptions extends HttpRequestOptions {
-  /** Disable caching for this specific request */
   noCache?: boolean;
 }
 
@@ -26,10 +19,6 @@ export abstract class BaseApiService {
     this.http = http;
   }
 
-  /**
-   * Build a stable, low-cardinality cache key (never embed raw tokens).
-   * Default uses method + path + minimal context. Override for per-user keys.
-   */
   protected buildCacheKey(method: string, path: string, context?: CacheKeyContext): string {
     const parts: string[] = [method.toUpperCase(), path];
     if (context) {
@@ -42,10 +31,6 @@ export abstract class BaseApiService {
     return parts.join("|");
   }
 
-  /**
-   * Map a network/HTTP failure to a normalized SocialApiError.
-   * Subclasses may override for platform-specific error shapes.
-   */
   protected toApiError(error: unknown, fallbackMessage: string): SocialApiError {
     if (error instanceof Error) {
       return {
@@ -61,11 +46,6 @@ export abstract class BaseApiService {
     };
   }
 
-  /**
-   * Helper: re-shape a SocialApiResponse by transforming its `data` field
-   * when the response is successful. Centralizes the `data` undefined check
-   * that callers otherwise have to repeat.
-   */
   protected mapData<T, R>(
     response: SocialApiResponse<T>,
     transform: (data: T) => R
@@ -73,15 +53,9 @@ export abstract class BaseApiService {
     if (!response.success) {
       return { success: false, error: response.error };
     }
-    // After `response.success` is true, `data` is guaranteed to be defined.
-    // Cast through `unknown` to satisfy strict null checks without disabling
-    // type safety on the response envelope.
     return { success: true, data: transform(response.data as T) };
   }
 
-  /**
-   * Make an authenticated GET request with optional caching.
-   */
   protected async get<T>(
     path: string,
     accessToken: string,
@@ -113,9 +87,6 @@ export abstract class BaseApiService {
     }
   }
 
-  /**
-   * Make an authenticated POST request.
-   */
   protected async post<T>(
     path: string,
     accessToken: string,
@@ -144,9 +115,6 @@ export abstract class BaseApiService {
     }
   }
 
-  /**
-   * Make an authenticated POST with form-urlencoded body.
-   */
   protected async postForm<T>(
     path: string,
     accessToken: string,
@@ -178,9 +146,6 @@ export abstract class BaseApiService {
     }
   }
 
-  /**
-   * Make an authenticated DELETE request.
-   */
   protected async delete<T>(
     path: string,
     accessToken: string,
@@ -211,30 +176,16 @@ export abstract class BaseApiService {
     }
   }
 
-  /**
-   * Build the full URL for a given path. Override for instance-based platforms
-   * (e.g., Mastodon) by combining baseUrl with the per-instance endpoint.
-   */
   protected url(path: string): string {
     return `${this.baseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
   }
 
-  /**
-   * Override to provide the platform's base URL.
-   */
   protected abstract baseUrl(): string;
 
-  /**
-   * Build auth headers. Default uses Bearer. Override for bot-based platforms.
-   */
   protected authHeaders(token: string): Record<string, string> {
     return { Authorization: `Bearer ${token}` };
   }
 
-  /**
-   * Parse an error response body into a SocialApiError.
-   * Default uses HTTP status as code and parses JSON if available.
-   */
   protected async parseError(response: Response, fallback: string): Promise<SocialApiError> {
     const contentType = response.headers.get("content-type");
     if (contentType?.includes("application/json")) {
@@ -246,7 +197,6 @@ export abstract class BaseApiService {
           details: errorBody,
         };
       } catch {
-        // fall through
       }
     }
     return {

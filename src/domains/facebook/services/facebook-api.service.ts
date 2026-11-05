@@ -1,6 +1,3 @@
-/**
- * Facebook API Service
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { FacebookUser, FacebookPost, FacebookPage } from "../types/facebook.types";

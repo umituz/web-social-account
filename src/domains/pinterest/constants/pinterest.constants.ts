@@ -1,13 +1,9 @@
-/**
- * Pinterest API Constants
- */
 
 export const PINTEREST_API_ENDPOINTS = {
   BASE_URL: "https://api.pinterest.com/v5",
   AUTHORIZATION_URL: "https://www.pinterest.com/oauth/",
   TOKEN_URL: "https://api.pinterest.com/v5/oauth/token",
 
-  // API endpoints
   USER: "/me",
   USER_BOARDS: "/me/boards",
   BOARD_PINS: "/boards",

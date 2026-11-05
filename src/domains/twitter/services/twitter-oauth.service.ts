@@ -1,6 +1,3 @@
-/**
- * Twitter OAuth Service
- */
 
 import type { PlatformConfig, SocialPlatform } from "../../../domain/types";
 import { BaseOAuthService, TokenRequestBody, AuthorizationUrlParams } from "../../core/oauth/services/base-oauth.service";

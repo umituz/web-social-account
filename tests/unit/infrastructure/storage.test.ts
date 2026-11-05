@@ -1,6 +1,3 @@
-/**
- * Tests for Storage Adapters
- */
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { LocalStorageAdapter, SessionStorageAdapter } from "../../../src/infrastructure/storage";
@@ -46,12 +43,12 @@ describe("LocalStorageAdapter", () => {
     const oldState = {
       state: "old-state",
       userId: "user-123",
-      timestamp: Date.now() - 700000, // 11+ minutes ago
+      timestamp: Date.now() - 700000,
       platform: "twitter" as const,
     };
 
     await adapter.setOAuthState("old-key", oldState);
-    await adapter.clearExpired(600000); // 10 minutes max age
+    await adapter.clearExpired(600000);
 
     const retrieved = await adapter.getOAuthState("old-key");
     expect(retrieved).toBeNull();

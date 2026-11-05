@@ -1,6 +1,3 @@
-/**
- * Facebook-specific types
- */
 
 export interface FacebookPage {
   id: string;
@@ -52,9 +49,6 @@ export interface facebookError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Facebook OAuth/API Error
- */
 export class FacebookError extends Error {
   constructor(
     message: string,

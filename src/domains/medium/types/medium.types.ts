@@ -1,6 +1,3 @@
-/**
- * Medium-specific types
- */
 
 export interface MediumUser {
   id: string;
@@ -53,9 +50,6 @@ export interface mediumError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Medium OAuth/API Error
- */
 export class MediumError extends Error {
   constructor(
     message: string,

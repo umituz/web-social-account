@@ -1,10 +1,3 @@
-/**
- * Mastodon API Service
- *
- * Mastodon is federated; the instance URL must be supplied at construction
- * time. Override `url()` so the base URL is the instance URL and not the
- * class-level constant.
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { MastodonAccount, MastodonStatus } from "../types/mastodon.types";

@@ -1,6 +1,3 @@
-/**
- * LinkedIn API Service
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { LinkedInPost, LinkedInProfile } from "../types/linkedin.types";

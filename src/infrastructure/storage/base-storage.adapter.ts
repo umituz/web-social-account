@@ -1,9 +1,3 @@
-/**
- * Base Web Storage Adapter - Template Method Pattern
- *
- * Provides in-memory cache + storage I/O. Subclasses bind to a specific
- * Storage implementation (localStorage, sessionStorage, or custom).
- */
 
 import type { ISessionStorage } from "../../domains/core/session/repositories/session-storage.interface";
 import type { SessionData, OAuthState } from "../../domain/types";
@@ -38,14 +32,8 @@ export abstract class BaseStorageAdapter implements ISessionStorage {
     }
   }
 
-  /**
-   * Provide the underlying storage. Throws if not available.
-   */
   protected abstract storage(): StorageLike;
 
-  /**
-   * Whether the storage backend is available in this environment.
-   */
   protected isAvailable(): boolean {
     try {
       return typeof this.storage() !== "undefined";
@@ -186,7 +174,7 @@ export abstract class BaseStorageAdapter implements ISessionStorage {
 
   async clearExpired(maxAge: number): Promise<void> {
     const now = Date.now();
-    this.clearExpiredByPrefix(this.statePrefix, maxAge, (raw) => {
+    this.clearExpiredByPrefix(this.statePrefix, this.stateCache, (raw) => {
       try {
         const state = JSON.parse(raw) as OAuthState;
         return now - state.timestamp > maxAge;
@@ -194,7 +182,7 @@ export abstract class BaseStorageAdapter implements ISessionStorage {
         return true;
       }
     });
-    this.clearExpiredByPrefix(this.sessionPrefix, maxAge, (raw) => {
+    this.clearExpiredByPrefix(this.sessionPrefix, this.sessionCache, (raw) => {
       try {
         const session = JSON.parse(raw) as SessionData;
         return now - session.oauthState.timestamp > maxAge;
@@ -206,9 +194,9 @@ export abstract class BaseStorageAdapter implements ISessionStorage {
     this.pruneCache(this.sessionCache);
   }
 
-  private clearExpiredByPrefix(
+  private clearExpiredByPrefix<T>(
     prefix: string,
-    _maxAge: number,
+    cache: Map<string, CacheEntry<T>>,
     shouldRemove: (raw: string) => boolean
   ): void {
     const store = this.storage();
@@ -216,6 +204,7 @@ export abstract class BaseStorageAdapter implements ISessionStorage {
       const value = store.getItem(key);
       if (!value || shouldRemove(value)) {
         store.removeItem(key);
+        cache.delete(key.replace(prefix, ""));
       }
     }
   }

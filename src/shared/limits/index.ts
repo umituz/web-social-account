@@ -1,6 +1,3 @@
-/**
- * Limits module barrel
- */
 
 export * from "./twitter";
 export * from "./linkedin";

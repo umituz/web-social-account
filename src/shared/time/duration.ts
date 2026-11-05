@@ -1,10 +1,3 @@
-/**
- * Duration unit conversions (milliseconds).
- *
- * All time-based values across the package are expressed in milliseconds.
- * This module centralizes the conversions so callers never hand-roll
- * `1000 * 60` etc.
- */
 
 const MILLISECONDS_PER_SECOND = 1000;
 const SECONDS_PER_MINUTE = 60;

@@ -1,10 +1,3 @@
-/**
- * Whether a `PlatformOAuthConfig` carries the minimum parameters required
- * to begin the authorization-code flow.
- *
- * Centralized so every entry-point (entity validator, runtime guard,
- * config-from-platform factory) checks the same invariants.
- */
 
 import type { PlatformOAuthConfig } from "../../domain/types";
 

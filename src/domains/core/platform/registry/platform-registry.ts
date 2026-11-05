@@ -1,9 +1,3 @@
-/**
- * Platform Registry - Registry + Factory Pattern
- *
- * Single source of truth for OAuth and API service instantiation per platform.
- * Adding a new platform only requires registering it here.
- */
 
 import type { SocialPlatform, PlatformConfig } from "../../../../domain/types";
 import { HttpClient } from "../../../../infrastructure/http/http-client.util";

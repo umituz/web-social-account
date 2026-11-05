@@ -1,6 +1,3 @@
-/**
- * OAuth State Entity
- */
 
 import type { OAuthState, SocialPlatform } from "../../../../domain/types";
 import { minutesToMs } from "../../../../shared/time/duration";

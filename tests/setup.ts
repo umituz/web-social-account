@@ -1,8 +1,4 @@
-/**
- * Test setup file
- */
 
-// Mock crypto for Node.js environment
 if (!global.crypto) {
   global.crypto = {
     getRandomValues: (array: Uint8Array) => {
@@ -20,7 +16,6 @@ if (!global.crypto) {
     },
     subtle: {
       digest: async (_algorithm: string, data: Uint8Array) => {
-        // Simple hash mock for testing
         const hash = Array.from(data)
           .reduce((acc, byte) => acc + byte.toString(16).padStart(2, "0"), "");
         return new TextEncoder().encode(hash);

@@ -1,10 +1,3 @@
-/**
- * Telegram Bot API Service
- *
- * Telegram does not use bearer tokens. All requests are authenticated with
- * the bot token in the URL. Response shape is `{ ok, result, error_code,
- * description }`. Errors are normalized through the base class.
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type {
@@ -25,9 +18,6 @@ export class TelegramApiService extends BaseApiService {
     return "https://api.telegram.org";
   }
 
-  /**
-   * Telegram responses wrap data in `{ ok, result, error_code, description }`.
-   */
   private async callTelegram<T>(
     botToken: string,
     method: string,

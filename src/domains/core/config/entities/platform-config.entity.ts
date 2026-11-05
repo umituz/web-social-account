@@ -1,11 +1,3 @@
-/**
- * Platform Config Entity
- *
- * Holds OAuth + API settings for a single platform and builds the
- * authorization URL. Platform-specific defaults live in
- * `platform-config-defaults.ts` (single responsibility: this entity owns
- * URL construction + validation; defaults live elsewhere).
- */
 
 import type { PlatformConfig, SocialPlatform } from "../../../../domain/types";
 import { PLATFORM_DEFAULTS, PlatformOAuthDefaults } from "./platform-config-defaults";

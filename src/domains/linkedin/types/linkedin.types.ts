@@ -1,6 +1,3 @@
-/**
- * LinkedIn-specific types
- */
 
 import {
   LINKEDIN_SHARE_CONTENT,

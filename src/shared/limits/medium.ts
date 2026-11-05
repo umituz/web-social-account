@@ -1,6 +1,3 @@
-/**
- * Medium platform limits
- */
 
 import { secondsToMs } from "../time/duration";
 

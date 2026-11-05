@@ -1,9 +1,3 @@
-/**
- * React hook for social media authentication
- *
- * Uses the PlatformRegistry to resolve the right OAuth service for any
- * platform and exposes a stable connect/disconnect API.
- */
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { SocialPlatform, PlatformConfig, SocialAccount } from "../../domain/types";

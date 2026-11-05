@@ -1,10 +1,3 @@
-/**
- * Medium API Service
- *
- * Medium returns data wrapped in `{ data: ... }`. The base parser
- * already handles JSON error parsing for non-2xx responses; on success we
- * unwrap the `data` envelope for ergonomic return shapes.
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { MediumUser, MediumPublication, MediumPost } from "../types/medium.types";

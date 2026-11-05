@@ -1,6 +1,3 @@
-/**
- * Reddit API Service
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { RedditUser, RedditPost, RedditSubreddit } from "../types/reddit.types";

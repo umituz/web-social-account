@@ -1,6 +1,3 @@
-/**
- * Youtube domain exports
- */
 
 export * from "./constants";
 export * from "./types";

@@ -1,6 +1,3 @@
-/**
- * TikTok API Service
- */
 
 import type { SocialApiResponse } from "../../../domain/types";
 import type { TikTokUser, TikTokVideo } from "../types/tiktok.types";

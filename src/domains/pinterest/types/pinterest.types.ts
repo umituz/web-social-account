@@ -1,6 +1,3 @@
-/**
- * Pinterest-specific types
- */
 
 export interface PinterestUser {
   id: string;
@@ -56,9 +53,6 @@ export interface PinterestApiError {
   error: string | { message: string; code?: number };
 }
 
-/**
- * Pinterest OAuth/API Error
- */
 export class PinterestError extends Error {
   constructor(
     message: string,

@@ -1,6 +1,3 @@
-/**
- * OAuth Service Interface
- */
 
 import type { SocialPlatform } from "../../../../domain/types";
 
@@ -11,17 +8,11 @@ export interface OAuthTokenResponse {
 }
 
 export interface IOAuthService {
-  /**
-   * Generate authorization URL for OAuth flow
-   */
   generateAuthorizationUrl(
     platform: SocialPlatform,
     userId?: string
   ): Promise<{ url: string; state: string }>;
 
-  /**
-   * Exchange authorization code for access tokens
-   */
   exchangeCodeForToken(
     platform: SocialPlatform,
     code: string,
@@ -29,27 +20,15 @@ export interface IOAuthService {
     redirectUri: string
   ): Promise<OAuthTokenResponse>;
 
-  /**
-   * Refresh access token using refresh token
-   */
   refreshToken(
     platform: SocialPlatform,
     refreshToken: string
   ): Promise<OAuthTokenResponse>;
 
-  /**
-   * Revoke access token
-   */
   revokeToken(platform: SocialPlatform, token: string): Promise<void>;
 
-  /**
-   * Validate OAuth state
-   */
   validateState(state: string): Promise<boolean>;
 
-  /**
-   * Generate PKCE code challenge
-   */
   generatePKCEChallenge(): Promise<{
     codeVerifier: string;
     codeChallenge: string;

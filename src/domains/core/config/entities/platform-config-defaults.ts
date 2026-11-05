@@ -1,8 +1,3 @@
-/**
- * Platform OAuth defaults - single source of truth for per-platform URLs
- * and scopes. Kept separate from PlatformConfigEntity so the entity can
- * focus on URL construction + validation.
- */
 
 import type { PlatformOAuthConfig, SocialPlatform } from "../../../../domain/types";
 

@@ -1,9 +1,3 @@
-/**
- * Telegram API Constants
- *
- * Telegram uses a bot token in the URL rather than Bearer auth.
- * All endpoints are POST/GET against `https://api.telegram.org/bot<token>/<method>`.
- */
 
 export const TELEGRAM_API_ENDPOINTS = {
   BASE_URL: "https://api.telegram.org",

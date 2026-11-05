@@ -1,10 +1,3 @@
-/**
- * Discord API Service
- *
- * Note: Discord uses bot tokens for some operations and bearer tokens for
- * others. The base class' `authHeaders` builds Bearer headers; callers that
- * need bot auth should use `authHeadersAsBot`.
- */
 
 import type { SocialPostContent, SocialApiResponse } from "../../../domain/types";
 import type { DiscordUser, DiscordGuild, DiscordChannel, DiscordMessage } from "../types/discord.types";
@@ -20,9 +13,6 @@ export class DiscordApiService extends BaseApiService {
     return "https://discord.com/api/v10";
   }
 
-  /**
-   * Build auth headers using a bot token (used for guild/channel/message ops).
-   */
   private botHeaders(botToken: string): Record<string, string> {
     return { Authorization: `Bot ${botToken}` };
   }

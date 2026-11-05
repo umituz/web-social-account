@@ -1,6 +1,3 @@
-/**
- * Discord API Constants
- */
 
 export const DISCORD_API_ENDPOINTS = {
   BASE_URL: "https://discord.com/api/v10",

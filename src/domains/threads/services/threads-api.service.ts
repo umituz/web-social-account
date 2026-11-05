@@ -1,6 +1,3 @@
-/**
- * Threads API Service
- */
 
 import type { SocialApiResponse } from "../../../domain/types";
 import type { ThreadsUser, ThreadsPost } from "../types/threads.types";

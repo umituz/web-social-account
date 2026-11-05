@@ -1,6 +1,3 @@
-/**
- * Twitter / X platform limits
- */
 
 import { secondsToMs } from "../time/duration";
 

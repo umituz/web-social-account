@@ -1,8 +1,4 @@
-/**
- * Core types for social media account management
- */
 
-// Platform identifiers
 export type SocialPlatform =
   | "twitter"
   | "linkedin"
@@ -18,18 +14,14 @@ export type SocialPlatform =
   | "mastodon"
   | "medium";
 
-// OAuth flow types
 export type OAuthResponseType = "code" | "token";
 
 export type PKCECodeChallengeMethod = "plain" | "S256";
 
-// Account status
 export type AccountStatus = "active" | "expired" | "revoked" | "error";
 
-// Permission scopes
 export type Scope = string;
 
-// Token types
 export interface AccessToken {
   token: string;
   expiresAt: number | null;
@@ -44,7 +36,6 @@ export interface OAuthTokens {
   scope?: string;
 }
 
-// Account profile
 export interface SocialAccountProfile {
   platform: SocialPlatform;
   accountId: string;
@@ -57,7 +48,6 @@ export interface SocialAccountProfile {
   bio?: string;
 }
 
-// Configuration types
 export interface PlatformOAuthConfig {
   clientId: string;
   clientSecret: string;
@@ -78,7 +68,6 @@ export interface PlatformConfig {
   maxRetries?: number;
 }
 
-// OAuth state
 export interface OAuthState {
   state: string;
   codeVerifier?: string;
@@ -88,7 +77,6 @@ export interface OAuthState {
   redirectUri?: string;
 }
 
-// Account entity
 export interface SocialAccount {
   id: string;
   userId: string;
@@ -101,13 +89,11 @@ export interface SocialAccount {
   lastUsedAt?: number;
 }
 
-// Session storage
 export interface SessionData {
   oauthState: OAuthState;
   callbackData?: Record<string, unknown>;
 }
 
-// API Response types
 export interface SocialApiResponse<T = unknown> {
   success: boolean;
   data?: T;
@@ -120,7 +106,6 @@ export interface SocialApiError {
   details?: unknown;
 }
 
-// Post content types
 export interface MediaAttachment {
   type: "image" | "video" | "gif" | "document";
   url: string;
@@ -136,7 +121,6 @@ export interface SocialPostContent {
   mentions?: string[];
 }
 
-// Platform-specific capabilities
 export interface PlatformCapabilities {
   maxTextLength: number;
   maxMediaCount: number;
@@ -146,7 +130,6 @@ export interface PlatformCapabilities {
   supportsAnalytics: boolean;
 }
 
-// Hooks config
 export interface UseSocialAccountConfig {
   platform: SocialPlatform;
   config: PlatformConfig;

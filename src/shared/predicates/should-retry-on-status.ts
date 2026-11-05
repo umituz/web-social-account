@@ -1,12 +1,3 @@
-/**
- * Whether the HTTP client should retry a request based on the response status.
- *
- * Rules:
- * - 4xx (except 429) → caller error, no retry.
- * - 429 → transient, retry with backoff.
- * - 5xx → transient, retry with backoff.
- * - Network errors (no status) → retry.
- */
 
 export const shouldRetryOnStatus = (status: number): boolean => {
   if (status >= 500) return true;

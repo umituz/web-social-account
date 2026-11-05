@@ -1,9 +1,3 @@
-/**
- * Exponential backoff with a hard cap.
- *
- * Used for HTTP retry delays. The delay doubles on every attempt but
- * never exceeds `maxDelayMs`.
- */
 
 export interface BackoffParams {
   attempt: number;
